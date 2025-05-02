@@ -1,0 +1,38 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffffff;
+    color: #000;
+  }
+.Footer-comp{
+    max-width: 100%;
+    margin: auto;
+    padding: 0 0;
+}
+.footer {
+    text-align: center;
+    padding: 40px 0 20px;
+    color: #333;
+    font-size: 14px;
+  }
+  
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .footer-links span {
+    cursor: pointer;
+    color: #333;
+    text-decoration: none;
+  }
+  
+  
+  .footer p {
+    margin: 0;
+  }
+  
