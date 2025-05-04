@@ -1,14 +1,31 @@
 import './Header2.css';
-import { useState } from 'react'; // Import useState hook
-import { Search, Bookmark, Bell, User, ChevronDown } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Bookmark, Bell, User, MoreHorizontal } from 'lucide-react';
 
 const Header2 = ({ onTopicSelect }) => {
-  const [activeTopic, setActiveTopic] = useState('For You'); // Track the active topic
+  const [activeTopic, setActiveTopic] = useState('For You');
+  const [userTopics, setUserTopics] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    const storedTopics = localStorage.getItem('selectedTopics');
+    if (storedTopics) {
+      try {
+        setUserTopics(JSON.parse(storedTopics));
+      } catch (err) {
+        console.error('Error parsing selectedTopics:', err);
+      }
+    }
+  }, []);
 
   const handleTopicClick = (topic) => {
-    setActiveTopic(topic);  // Set the active topic when a topic is clicked
-    onTopicSelect(topic);    // Pass the topic to the parent
+    setActiveTopic(topic);
+    setShowDropdown(false); // close dropdown if open
+    if (onTopicSelect) onTopicSelect(topic);
   };
+
+  const visibleTopics = userTopics.slice(0, 2);
+  const hiddenTopics = userTopics.slice(2);
 
   return (
     <div>
@@ -32,29 +49,46 @@ const Header2 = ({ onTopicSelect }) => {
             >
               Latest
             </a>
-            <a
-              href="#"
-              className={`nav-link ${activeTopic === 'Technology' ? 'active' : ''}`}
-              onClick={() => handleTopicClick('Technology')}
-            >
-              Technology
-            </a>
-            <a
-              href="#"
-              className={`nav-link ${activeTopic === 'Travel' ? 'active' : ''}`}
-              onClick={() => handleTopicClick('Travel')}
-            >
-              Travel
-            </a>
-            <a
-              href="#"
-              className={`nav-link ${activeTopic === 'Food' ? 'active' : ''} dropdown`}
-              onClick={() => handleTopicClick('Food')}
-            >
-              Food <ChevronDown size={16} />
-            </a>
+
+            {/* Visible Topics */}
+            {visibleTopics.map((topic) => (
+              <a
+                key={topic}
+                href="#"
+                className={`nav-link ${activeTopic === topic ? 'active' : ''}`}
+                onClick={() => handleTopicClick(topic)}
+              >
+                {topic.replace(/^#/, '')}
+              </a>
+            ))}
+
+            {/* Three-dot dropdown */}
+            {hiddenTopics.length > 0 && (
+              <div className="dropdown-wrapper">
+                <button
+                  className="icon-button"
+                  onClick={() => setShowDropdown(!showDropdown)}
+                >
+                  <MoreHorizontal size={20} />
+                </button>
+                {showDropdown && (
+                  <div className="dropdown-menu">
+                    {hiddenTopics.map((topic) => (
+                      <div
+                        key={topic}
+                        className={`dropdown-item ${activeTopic === topic ? 'active' : ''}`}
+                        onClick={() => handleTopicClick(topic)}
+                      >
+                        {topic.replace(/^#/, '')}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </nav>
         </div>
+
         <div className="header-right">
           <div className="search-container">
             <Search size={20} />
