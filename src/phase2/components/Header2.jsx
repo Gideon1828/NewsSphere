@@ -1,6 +1,6 @@
 import './Header2.css';
 import { useState, useEffect, useRef } from 'react';
-import { Search as SearchIcon, Bookmark, Bell, User, MoreHorizontal } from 'lucide-react';
+import { Search as SearchIcon, Bookmark, Bell, MoreHorizontal, User, Check  } from 'lucide-react';
 import Search from '../pages/Search';
 
 const Header2 = ({ onTopicSelect }) => {
@@ -9,6 +9,11 @@ const Header2 = ({ onTopicSelect }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const searchRef = useRef(null);
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(true)
+  const dropdownRef = useRef(null)
+  const profileRef = useRef(null)
 
   useEffect(() => {
     const storedTopics = localStorage.getItem('selectedTopics');
@@ -19,7 +24,8 @@ const Header2 = ({ onTopicSelect }) => {
         console.error('Error parsing selectedTopics:', err);
       }
     }
-  }, []);
+  }
+  , []);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -30,6 +36,44 @@ const Header2 = ({ onTopicSelect }) => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+//Profile Section
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target) &&
+        profileRef.current &&
+        !profileRef.current.contains(event.target)
+      ) {
+        setIsDropdownOpen(false)
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside)
+    }
+  }, [])
+
+   // Toggle dark mode
+   const toggleDarkMode = () => {
+    setIsDarkMode(!isDarkMode)
+    // In a real application, you would apply dark mode to the entire site
+    document.body.classList.toggle("dark-mode")
+  }
+
+  // Handle logout
+  const handleLogout = () => {
+    console.log("Logging out...")
+    // In a real application, you would implement actual logout logic here
+  }
+
+  // Handle navigation
+  const handleNavigation = (destination) => {
+    console.log(`Navigating to: ${destination}`)
+    // In a real application, you would implement actual navigation here
+    setIsDropdownOpen(false)
+  }
 
   const handleTopicClick = (topic) => {
     setActiveTopic(topic);
@@ -95,7 +139,7 @@ const Header2 = ({ onTopicSelect }) => {
           </nav>
         </div>
 
-        <div className="header-right">
+        <div className="header-right ">
           <div className="search-container" onClick={() => setShowSearch(true)}>
             <SearchIcon size={20} />
             <span className="search-text">SEARCH</span>
@@ -106,9 +150,39 @@ const Header2 = ({ onTopicSelect }) => {
           <button className="icon-button">
             <Bell size={20} />
           </button>
-          <button className="icon-button user-icon">
-            <User size={20} />
+          <div className='profile-wrapper'>
+
+          
+          <button className="nav-item profile-icon" onClick={() => setIsDropdownOpen(!isDropdownOpen)} ref={profileRef}>
+            <User size={24} strokeWidth={2} />
           </button>
+
+          {/* Profile Section */}
+          {isDropdownOpen && (
+          <div className="dropdown-menu" ref={dropdownRef}>
+            <button className="dropdown-item" onClick={() => handleNavigation("profile")}>
+             Profile
+            </button>
+            <button className="dropdown-item" onClick={() => handleNavigation("options")}>
+              Options
+            </button>
+            <button className="dropdown-item" onClick={toggleDarkMode}>
+              {isDarkMode && <Check size={24} />}
+              <span>Dark mode</span>
+            </button>
+            <button className="dropdown-item" onClick={() => handleNavigation("privacy")}>
+             Privacy policy
+              </button>
+            <button className="dropdown-item" onClick={() => handleNavigation("help")}>
+             Help
+            </button>
+            <button className="dropdown-item" onClick={handleLogout}>
+             Logout
+            </button>
+          </div>
+          )}
+          </div>
+          
         </div>
       </header>
 
@@ -117,6 +191,7 @@ const Header2 = ({ onTopicSelect }) => {
           <Search onClose={() => setShowSearch(false)} onSelectTopic={handleTopicClick} />
         </div>
       )}
+
     </div>
   );
 };
