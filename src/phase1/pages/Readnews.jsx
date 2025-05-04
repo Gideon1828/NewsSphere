@@ -1,5 +1,5 @@
 import './Readnews.css'
-import Header from '../components/Header.jsx'
+import Header1 from '../components/Header1.jsx'
 import Footer from '../components/Footer.jsx'
 
 import { Link } from 'react-router-dom';
@@ -8,7 +8,7 @@ const Readnews = () => {
   return (
     <div>
         {/* 1. Header component */} 
-        <Header />
+        <Header1 />
         {/* 2. Main content */}
         <main className="Mymain">
       <div className="main-feature">

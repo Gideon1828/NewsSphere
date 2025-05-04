@@ -1,7 +1,7 @@
 import React, { useState } from "react"; // 1. Add useState
 import "./Home.css";
 import { Link } from 'react-router-dom';
-import Header from "../components/Header"
+import Header1 from "../components/Header1"
 import Footer from "../components/Footer";
 
 const Home = () => {
@@ -30,7 +30,7 @@ const Home = () => {
   return (
     <div>
       {/* 1. Header component */}  
-      <Header />
+      <Header1 />
 
       {/* 2. Main content */}
 <div className="news-page">
