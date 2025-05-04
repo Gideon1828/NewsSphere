@@ -229,6 +229,22 @@
     }
   }
   
+  .read-more {
+    text-align: center;
+    margin: 40px 0;
+  }
+  
+  .read-more button {
+    background-color: #ff5a1f;
+    color: white;
+    padding: 10px 20px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+
   /* Footer */
   .footer {
     margin-top: auto;
