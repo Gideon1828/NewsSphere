@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Aftersignup.css';
 import { Search, Bookmark, Bell, User, ChevronDown, Share, Loader } from 'lucide-react';
-
+import Header2 from '../components/Header2';
 const Aftersignup = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState("Anand");
@@ -46,38 +46,7 @@ const Aftersignup = () => {
   return (
     <div className="news-container">
       {/* Header */}
-      <header className="header">
-        <div className="header-left">
-          <div className="logo">
-            <div className="logo-icon"></div>
-          </div>
-          <nav className="nav-links">
-            <a href="#" className="nav-link active">For You</a>
-            <a href="#" className="nav-link">Latest</a>
-            <a href="#" className="nav-link">Technology</a>
-            <a href="#" className="nav-link">Travel</a>
-            <a href="#" className="nav-link dropdown">
-              Food
-              <ChevronDown size={16} />
-            </a>
-          </nav>
-        </div>
-        <div className="header-right">
-          <div className="search-container">
-            <Search size={20} />
-            <span className="search-text">SEARCH</span>
-          </div>
-          <button className="icon-button">
-            <Bookmark size={20} />
-          </button>
-          <button className="icon-button">
-            <Bell size={20} />
-          </button>
-          <button className="icon-button user-icon">
-            <User size={20} />
-          </button>
-        </div>
-      </header>
+      <Header2 />
 
       {/* Welcome message */}
       <div className="welcome-message">

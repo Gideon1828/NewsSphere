@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "./Categories.css";
 import { Link } from 'react-router-dom';
+import Header2 from "../components/Header2";
 
 function Categories() {
   const [showModal, setShowModal] = useState(false);
@@ -111,136 +112,8 @@ function Categories() {
     );
   };
 
-  // Header Component
-  const Header = () => {
-    return (
-      <header className="header">
-        <div className="header-container">
-          <div className="header-left">
-            <a href="/" className="logo-container">
-              <div className="logo">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect width="40" height="40" rx="4" fill="#FF5722" />
-                  <path d="M12 12H28V16H12V12Z" fill="white" />
-                  <path d="M12 18H28V22H12V18Z" fill="white" />
-                  <path d="M12 24H28V28H12V24Z" fill="white" />
-                </svg>
-              </div>
-              <span className="logo-text">For You</span>
-            </a>
-
-            <nav className="nav-menu">
-              <a href="/latest" className="nav-link">
-                Latest
-              </a>
-              <a href="/technology" className="nav-link">
-                Technology
-              </a>
-              <a href="/travel" className="nav-link">
-                Travel
-              </a>
-              <div className="dropdown">
-                <button
-                  className="nav-link dropdown-toggle"
-                  onClick={() => setShowFoodDropdown(!showFoodDropdown)}
-                >
-                  Food
-                  <svg
-                    className="dropdown-icon"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
-                  </svg>
-                </button>
-
-                {showFoodDropdown && (
-                  <div className="dropdown-menu">
-                    <a href="/food/recipes" className="dropdown-item">
-                      Recipes
-                    </a>
-                    <a href="/food/restaurants" className="dropdown-item">
-                      Restaurants
-                    </a>
-                    <a href="/food/cooking-tips" className="dropdown-item">
-                      Cooking Tips
-                    </a>
-                  </div>
-                )}
-              </div>
-            </nav>
-          </div>
-
-          <div className="header-right">
-            <button className="icon-button">
-              <svg className="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="sr-only">Search</span>
-            </button>
-            <button className="icon-button">
-              <svg className="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="sr-only">Bookmarks</span>
-            </button>
-            <button className="icon-button">
-              <svg className="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M13.73 21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6982 21.5547 10.4458 21.3031 10.27 21"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="sr-only">Notifications</span>
-            </button>
-            <button className="icon-button">
-              <svg className="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="sr-only">Profile</span>
-            </button>
-          </div>
-        </div>
-      </header>
-    );
-  };
+  
+  
 
   // News Card Component
   const NewsCard = () => {
@@ -344,7 +217,7 @@ function Categories() {
 
   return (
     <div className="app">
-      <Header />
+      <Header2 />
 
       {showModal && <WelcomeModal />}
 
