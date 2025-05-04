@@ -10,8 +10,16 @@ const Aftersignup = () => {
   const handleTopicSelect = (topic) => {
     setSelectedTopic(topic);
   };
-  // Simulate loading state
+// Load user data from localStorage
   useEffect(() => {
+    // Load user data from localStorage
+    const storedData = localStorage.getItem('user');
+    if (storedData) {
+      const user = JSON.parse(storedData);
+      setUserName(user.fullName || 'User'); // fallback if fullName is not set
+    }
+  // Simulate loading state
+  
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1500);
