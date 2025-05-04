@@ -1,0 +1,97 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+      "Helvetica Neue", sans-serif;
+  }
+  
+  body {
+    background-color: #f9f9f9;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid #e0e0e0;
+    background-color: white;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+  }
+  .login-logo{
+    width: 20px;
+    height: 40px;
+  }
+ 
+  .nav-links {
+    display: flex;
+    gap: 20px;
+  }
+  
+  .nav-link {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+    font-size: 16px;
+    padding: 5px 0;
+    position: relative;
+  }
+  
+  .nav-link.active {
+    font-weight: 700;
+    color: #000;
+  }
+  
+  .nav-link.dropdown {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .search-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .search-text {
+    font-size: 14px;
+    color: #666;
+  }
+  
+  .icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+  }
+  
+  .user-icon {
+    background-color: #f0f0f0;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+  }
