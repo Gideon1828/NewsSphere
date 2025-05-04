@@ -1,11 +1,14 @@
 import './Header2.css';
-import { useState, useEffect } from 'react';
-import { Search, Bookmark, Bell, User, MoreHorizontal } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Search as SearchIcon, Bookmark, Bell, User, MoreHorizontal } from 'lucide-react';
+import Search from '../pages/Search';
 
 const Header2 = ({ onTopicSelect }) => {
   const [activeTopic, setActiveTopic] = useState('For You');
   const [userTopics, setUserTopics] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const searchRef = useRef(null);
 
   useEffect(() => {
     const storedTopics = localStorage.getItem('selectedTopics');
@@ -18,9 +21,19 @@ const Header2 = ({ onTopicSelect }) => {
     }
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setShowSearch(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   const handleTopicClick = (topic) => {
     setActiveTopic(topic);
-    setShowDropdown(false); // close dropdown if open
+    setShowDropdown(false);
     if (onTopicSelect) onTopicSelect(topic);
   };
 
@@ -49,8 +62,6 @@ const Header2 = ({ onTopicSelect }) => {
             >
               Latest
             </a>
-
-            {/* Visible Topics */}
             {visibleTopics.map((topic) => (
               <a
                 key={topic}
@@ -61,14 +72,9 @@ const Header2 = ({ onTopicSelect }) => {
                 {topic.replace(/^#/, '')}
               </a>
             ))}
-
-            {/* Three-dot dropdown */}
             {hiddenTopics.length > 0 && (
               <div className="dropdown-wrapper">
-                <button
-                  className="icon-button"
-                  onClick={() => setShowDropdown(!showDropdown)}
-                >
+                <button className="icon-button" onClick={() => setShowDropdown(!showDropdown)}>
                   <MoreHorizontal size={20} />
                 </button>
                 {showDropdown && (
@@ -90,8 +96,8 @@ const Header2 = ({ onTopicSelect }) => {
         </div>
 
         <div className="header-right">
-          <div className="search-container">
-            <Search size={20} />
+          <div className="search-container" onClick={() => setShowSearch(true)}>
+            <SearchIcon size={20} />
             <span className="search-text">SEARCH</span>
           </div>
           <button className="icon-button">
@@ -105,6 +111,12 @@ const Header2 = ({ onTopicSelect }) => {
           </button>
         </div>
       </header>
+
+      {showSearch && (
+        <div className="search-overlay" ref={searchRef}>
+          <Search onClose={() => setShowSearch(false)} onSelectTopic={handleTopicClick} />
+        </div>
+      )}
     </div>
   );
 };
