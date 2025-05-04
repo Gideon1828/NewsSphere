@@ -1,24 +1,57 @@
-import './Header2.css'
-import { Search, Bookmark, Bell, User, ChevronDown, Share, Loader } from 'lucide-react';
+import './Header2.css';
+import { useState } from 'react'; // Import useState hook
+import { Search, Bookmark, Bell, User, ChevronDown } from 'lucide-react';
 
-const Header2 = () => {
+const Header2 = ({ onTopicSelect }) => {
+  const [activeTopic, setActiveTopic] = useState('For You'); // Track the active topic
+
+  const handleTopicClick = (topic) => {
+    setActiveTopic(topic);  // Set the active topic when a topic is clicked
+    onTopicSelect(topic);    // Pass the topic to the parent
+  };
+
   return (
     <div>
       <header className="header">
         <div className="header-left">
           <div className="logo">
-          
             <img src="/logo.png" alt="NewsSphere Logo" className="login-logo" />
-          
           </div>
           <nav className="nav-links">
-            <a href="#" className="nav-link active">For You</a>
-            <a href="#" className="nav-link">Latest</a>
-            <a href="#" className="nav-link">Technology</a>
-            <a href="#" className="nav-link">Travel</a>
-            <a href="#" className="nav-link dropdown">
-              Food
-              <ChevronDown size={16} />
+            <a
+              href="#"
+              className={`nav-link ${activeTopic === 'For You' ? 'active' : ''}`}
+              onClick={() => handleTopicClick('For You')}
+            >
+              For You
+            </a>
+            <a
+              href="#"
+              className={`nav-link ${activeTopic === 'Latest' ? 'active' : ''}`}
+              onClick={() => handleTopicClick('Latest')}
+            >
+              Latest
+            </a>
+            <a
+              href="#"
+              className={`nav-link ${activeTopic === 'Technology' ? 'active' : ''}`}
+              onClick={() => handleTopicClick('Technology')}
+            >
+              Technology
+            </a>
+            <a
+              href="#"
+              className={`nav-link ${activeTopic === 'Travel' ? 'active' : ''}`}
+              onClick={() => handleTopicClick('Travel')}
+            >
+              Travel
+            </a>
+            <a
+              href="#"
+              className={`nav-link ${activeTopic === 'Food' ? 'active' : ''} dropdown`}
+              onClick={() => handleTopicClick('Food')}
+            >
+              Food <ChevronDown size={16} />
             </a>
           </nav>
         </div>
@@ -39,6 +72,7 @@ const Header2 = () => {
         </div>
       </header>
     </div>
-  )
-}
-export default Header2
+  );
+};
+
+export default Header2;

@@ -5,7 +5,11 @@ import Header2 from '../components/Header2';
 const Aftersignup = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState("Anand");
-  
+  const [selectedTopic, setSelectedTopic] = useState("For You");
+
+  const handleTopicSelect = (topic) => {
+    setSelectedTopic(topic);
+  };
   // Simulate loading state
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -46,7 +50,7 @@ const Aftersignup = () => {
   return (
     <div className="news-container">
       {/* Header */}
-      <Header2 />
+      <Header2 onTopicSelect={handleTopicSelect} />
 
       {/* Welcome message */}
       <div className="welcome-message">
@@ -56,7 +60,7 @@ const Aftersignup = () => {
       {/* For You section */}
       <div className="for-you-section">
         <h1 className="for-you-title">
-          For You
+        {selectedTopic}
           <span className="for-you-icon"></span>
         </h1>
         <p className="for-you-subtitle">The Best of EveryThing you Follow</p>

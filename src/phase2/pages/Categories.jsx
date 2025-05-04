@@ -2,18 +2,21 @@ import React, { useState, useEffect } from "react";
 import "./Categories.css";
 import { Link } from 'react-router-dom';
 import Header2 from "../components/Header2";
+import { useNavigate } from 'react-router-dom';
 
 function Categories() {
   const [showModal, setShowModal] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [showFoodDropdown, setShowFoodDropdown] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if user has already selected topics
     const savedTopics = localStorage.getItem("selectedTopics");
-
+    
     if (savedTopics) {
       setSelectedTopics(JSON.parse(savedTopics));
+      navigate('/Aftersignup');
     } else {
       // Show welcome modal if no topics are saved
       setShowModal(true);
