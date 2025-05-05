@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './Aftersignup.css';
 import { Bookmark, ChevronDown, Share, Loader } from 'lucide-react';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import Header2 from '../components/Header2';
 
 const Aftersignup = () => {
@@ -9,6 +10,13 @@ const Aftersignup = () => {
   const [selectedTopic, setSelectedTopic] = useState("For You");
   const [articlesToShow, setArticlesToShow] = useState(3); // Initially show 3 articles
 
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state && location.state.topic) {
+      setSelectedTopic(location.state.topic);
+    }
+  }, [location.state]);
   const handleTopicSelect = (topic) => {
     setSelectedTopic(topic);
   };

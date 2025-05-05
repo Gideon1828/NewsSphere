@@ -476,3 +476,12 @@ body.dark-mode {
   }
 }
 /*notification modal styles*/
+/* read later styles */
+.read-later-active {
+  color: orange;
+  transform: scale(1.1);
+}
+/* Change bookmark color to orange when on ReadLater page */
+.icon-button.active-bookmark {
+  color: #FF7043; /* Orange color */
+}
