@@ -8,6 +8,7 @@ import Signup from "./phase1/pages/Signup.jsx";
 
 import Categories from "./phase2/pages/Categories.jsx";
 import Aftersignup from "./phase2/pages/Aftersignup.jsx";
+import ReadLater from "./phase2/pages/ReadLater.jsx";
 
 
 const App = () => {
@@ -24,6 +25,8 @@ const App = () => {
           {/*Phase2*/}
           <Route path="Categories" element={<Categories />} />
           <Route path="Aftersignup" element={<Aftersignup />} />
+          <Route path="ReadLater" element={<ReadLater />} />
+
 
           
         </Routes>
