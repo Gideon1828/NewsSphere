@@ -5,37 +5,50 @@ import { useLocation, Link, useNavigate } from 'react-router-dom';
 
 import Search from '../pages/Search';
 
-const Header2 = ({ onTopicSelect }) => {
+const Header2 = ({ onTopicSelect ,topicclicked }) => {
   const location = useLocation();
   const navigate = useNavigate(); // ✅ Added for redirecting from ReadLater
   const isReadLaterPage = location.pathname === '/ReadLater';
   const isAfterSignupPage = location.pathname === '/Aftersignup'; // Add this check for AfterSignup
 
   const [activeTopic, setActiveTopic] = useState('');
-  const [userTopics, setUserTopics] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const searchRef = useRef(null);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const dropdownRef = useRef(null);
   const profileRef = useRef(null);
 
-  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+
   const modalRef = useRef(null);
+
+  const [userTopics, setUserTopics] = useState([]);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
   // Handle topics from localStorage
   useEffect(() => {
-    const storedTopics = localStorage.getItem('selectedTopics');
-    if (storedTopics) {
+    const fetchUserPreferences = async () => {
       try {
-        setUserTopics(JSON.parse(storedTopics));
+        const token = localStorage.getItem('token');
+        if (!token) return; // user not logged in
+
+        const res = await fetch('http://localhost:5000/api/user-preferences', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) throw new Error('Failed to fetch user preferences');
+
+        const data = await res.json();
+        setUserTopics(data.selectedCategory || []);
+        setNotificationsEnabled(data.isNotificationOn || false);
       } catch (err) {
-        console.error('Error parsing selectedTopics:', err);
+        console.error('Error fetching user preferences:', err);
       }
-    }
+    };
+
+    fetchUserPreferences();
   }, []);
 
   // Close search if clicked outside
@@ -67,6 +80,34 @@ const Header2 = ({ onTopicSelect }) => {
     };
   }, []);
 
+  // Handle notification preference
+  const handleNotificationPreference = async (enabled) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    // First, make API call
+    const res = await fetch('http://localhost:5000/api/save-notification', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ isNotificationOn: enabled }),
+    });
+
+    if (!res.ok) throw new Error('Failed to save notification preference');
+
+    // Update state ONLY after successful API call
+    setNotificationsEnabled(enabled);
+    setIsNotificationOpen(false); // ✅ Close modal here
+    console.log(`Notifications ${enabled ? 'enabled' : 'disabled'} for NewsSphere`);
+  } catch (err) {
+    console.error('Error saving notification preference:', err);
+  }
+};
+
+
   // Toggle dark mode
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -75,7 +116,12 @@ const Header2 = ({ onTopicSelect }) => {
 
   // Handle logout
   const handleLogout = () => {
-    console.log("Logging out...");
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('selectedCategory');
+    localStorage.removeItem('isNotificationOn');
+    navigate('/'); // Redirect to home page after logout
+    console.log("User logged out successfully");
   };
 
   // Handle navigation
@@ -97,9 +143,12 @@ const Header2 = ({ onTopicSelect }) => {
 
   // Only highlight topics if the user is not on ReadLater or AfterSignup
   useEffect(() => {
-    if (isReadLaterPage || isAfterSignupPage) {
+    if (isReadLaterPage ){ 
       setActiveTopic(''); // Do not highlight any topic on ReadLater or AfterSignup
-    }
+        }
+    if (isAfterSignupPage) {
+      setActiveTopic('For You');
+    } 
   }, [isReadLaterPage, isAfterSignupPage]);
 
   const visibleTopics = userTopics.slice(0, 2);
@@ -125,11 +174,7 @@ const Header2 = ({ onTopicSelect }) => {
     setIsNotificationOpen(!isNotificationOpen);
   };
 
-  const handleNotificationPreference = (enabled) => {
-    setNotificationsEnabled(enabled);
-    setIsNotificationOpen(false);
-    console.log(`Notifications ${enabled ? "enabled" : "disabled"} for NewsSphere`);
-  };
+ 
 
   return (
     <div>
@@ -199,7 +244,7 @@ const Header2 = ({ onTopicSelect }) => {
 
           <button
             className={`navbtn notification-bell ${!notificationsEnabled ? 'disabled' : ''}`}
-            onClick={toggleNotificationModal}
+            onClick={() => setIsNotificationOpen(!isNotificationOpen)}
           >
             <Bell size={24} strokeWidth={2} fill="#FF7043" color="#FF7043" />
           </button>

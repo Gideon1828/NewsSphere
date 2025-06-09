@@ -9,21 +9,43 @@ const Signup = () => {
 
   const navigate = useNavigate();
 
-  const handleSignup = () => {
-    if (email && fullName && password) {
-      const userData = {
-        email,
-        fullName,
-        password,
-      };
-
-      // Save user data to localStorage
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      // Redirect to categories page
-      navigate('/Categories');
-    } else {
+  const handleSignup = async () => {
+    if (!email || !fullName || !password) {
       alert('Please fill all fields.');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, fullName, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) 
+        {
+      alert(data.message);
+
+      // ✅ Correct way to store token
+      localStorage.setItem("token", data.token);
+      // ✅ Store user info (this includes fullName)
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      // ✅ Check if token is actually there
+      if (!data.token) {
+        console.error("No token found. User may not be logged in.");
+        return;
+      }
+
+        navigate('/Categories'); // or '/Aftersignup' depending on your flow
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      alert('Something went wrong. Please try again later.');
     }
   };
 

@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+-------------------------
+# Firebase Admin Key
+src/config/firebaseServiceKey.json
+  firebaseServiceKey.json
+*.jsonkey

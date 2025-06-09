@@ -116,6 +116,7 @@
     gap: 5px;
     padding: 10px;
   }
+
   
   .source-logo {
     width: 24px;
@@ -128,12 +129,14 @@
     overflow: hidden;
   }
   
-  .source-logo.cnbc {
-    background-color: #005594;
-    color: white;
-    font-size: 10px;
-    font-weight: bold;
+  
+
+   .source-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
   }
+  
   
   .source-name {
     font-size: 14px;

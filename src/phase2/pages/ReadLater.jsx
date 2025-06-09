@@ -1,129 +1,100 @@
-"use client"
+"use client";
 
-import { useState, useRef, useEffect } from "react"
-import { Search, Bookmark, Bell, User, ChevronDown, MoreHorizontal, Trash2, Share, Check } from "lucide-react"
-import "./ReadLater.css"
-import Header2 from "../components/Header2"
+import { useState, useRef, useEffect } from "react";
+import { Bookmark, MoreHorizontal, Trash2, Share } from "lucide-react";
+import "./ReadLater.css";
+import Header2 from "../components/Header2";
+import axios from "axios";
 
 const ReadLater = () => {
-  const [sortMenuOpen, setSortMenuOpen] = useState(false)
-  const [sortOption, setSortOption] = useState("latest")
-  const menuRef = useRef(null)
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const [sortOption, setSortOption] = useState("latest");
+  const menuRef = useRef(null);
+  const [savedArticles, setSavedArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Sample saved articles data
-  const [savedArticles, setSavedArticles] = useState([
-    {
-      id: 1,
-      source: "CNBC",
-      sourceImage: "/cnbc-logo.png",
-      timeAgo: "7 hours ago",
-      title: "Pope Francis on Breathing machine afer suffering sudden respiratory episode",
-      author: "matthew hawkins",
-      date: "feb 26,2025",
-      content:
-        "United arab emirates- feb 26,2025 : a cultural exchange delegation from china, organized by the state council information office, we know that Echange is Important for most of the Countries so far is kudo to the team So this is the first phase of the Project said Me",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/10.png-bOOTQxAD12o4f5NuV04TBBTDXcVaGA.jpeg",
-      expanded: false,
-      bookmarked: true,
-    },
-    {
-      id: 2,
-      source: "CNBC",
-      sourceImage: "/cnbc-logo.png",
-      timeAgo: "7 hours ago",
-      title: "Pope Francis on Breathing machine afer suffering sudden respiratory episode",
-      author: "matthew hawkins",
-      date: "feb 26,2025",
-      content:
-        "United arab emirates- feb 26,2025 : a cultural exchange delegation from china, organized by the state council information office, we know that Echange is Important for most of the Countries so far is kudo to the team So this is the first phase of the Project said Me",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/10.png-bOOTQxAD12o4f5NuV04TBBTDXcVaGA.jpeg",
-      expanded: false,
-      bookmarked: true,
-    },
-    {
-      id: 3,
-      source: "CNBC",
-      sourceImage: "/cnbc-logo.png",
-      timeAgo: "7 hours ago",
-      title: "Pope Francis on Breathing machine afer suffering sudden respiratory episode",
-      author: "matthew hawkins",
-      date: "feb 26,2025",
-      content:
-        "United arab emirates- feb 26,2025 : a cultural exchange delegation from china, organized by the state council information office, we know that Echange is Important for most of the Countries so far is kudo to the team So this is the first phase of the Project said Me",
-      image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/10.png-bOOTQxAD12o4f5NuV04TBBTDXcVaGA.jpeg",
-      expanded: false,
-      bookmarked: true,
-    },
-  ])
+  useEffect(() => {
+  const fetchSavedArticles = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const prefsRes = await axios.get("http://localhost:5000/api/user-preferences", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const savedTitles = prefsRes.data.readLaterNews || [];
+
+      // Map titles to article-like objects with placeholders
+      const articles = savedTitles.map((title, idx) => ({
+        title,
+        description: "No description available.",
+        url: "#", // No URL saved, so just a placeholder or you can remove the link
+        image: "/placeholder.svg",
+      }));
+
+      setSavedArticles(articles);
+    } catch (err) {
+      console.error("Error fetching saved articles:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchSavedArticles();
+}, []);
+
 
   // Close sort menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target) && !event.target.closest(".sort-button")) {
-        setSortMenuOpen(false)
+        setSortMenuOpen(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside)
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside)
-    }
-  }, [])
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
-  // Toggle sort menu
-  const toggleSortMenu = () => {
-    setSortMenuOpen(!sortMenuOpen)
-  }
+  const toggleSortMenu = () => setSortMenuOpen(!sortMenuOpen);
 
-  // Handle sort option change
   const handleSortChange = (option) => {
-    setSortOption(option)
+    setSortOption(option);
+    const sorted = [...savedArticles];
 
-    // Sort the articles based on the selected option
-    const sortedArticles = [...savedArticles]
     if (option === "oldest") {
-      // For demo purposes, we'll just reverse the array
-      sortedArticles.reverse()
+      sorted.reverse();
     }
 
-    setSavedArticles(sortedArticles)
-    setSortMenuOpen(false)
-  }
+    setSavedArticles(sorted);
+    setSortMenuOpen(false);
+  };
 
-  // Clear all saved articles
-  const clearAllArticles = () => {
-    setSavedArticles([])
-    setSortMenuOpen(false)
-  }
+  const clearAllArticles = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post("http://localhost:5000/api/clear-bookmarks", {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSavedArticles([]);
+    } catch (err) {
+      console.error("Error clearing bookmarks:", err);
+    }
+    setSortMenuOpen(false);
+  };
 
-  // Toggle article expansion
-  const toggleArticleExpansion = (id) => {
-    setSavedArticles(
-      savedArticles.map((article) => (article.id === id ? { ...article, expanded: !article.expanded } : article)),
-    )
-  }
+  const shareArticle = (article) => {
+    alert(`Sharing: ${article.title}`);
+  };
 
-  // Toggle bookmark status
-  const toggleBookmark = (id) => {
-    setSavedArticles(
-      savedArticles.map((article) => (article.id === id ? { ...article, bookmarked: !article.bookmarked } : article)),
-    )
-  }
-
-  // Share article
-  const shareArticle = (id) => {
-    const article = savedArticles.find((a) => a.id === id)
-    console.log(`Sharing article: ${article.title}`)
-    // In a real app, implement sharing functionality
-    alert(`Sharing: ${article.title}`)
-  }
+  if (loading) return <p>Loading saved articles...</p>;
 
   return (
     <div className="read-later-container">
-      {/* Header */}
-      <Header2/>
+      <Header2 />
 
-      {/* Read Later Content */}
       <main className="read-later-content">
         <div className="read-later-header">
           <h1 className="read-later-title">Read Later</h1>
@@ -175,58 +146,33 @@ const ReadLater = () => {
 
         <div className="sort-indicator">{sortOption === "latest" ? "Latest" : "Oldest"}</div>
 
-        {savedArticles.length > 0 ? (
+        {savedArticles.length === 0 ? (
+          <p>No saved articles found.</p>
+        ) : (
           <div className="articles-grid">
-            {savedArticles.map((article) => (
-              <div className="article-card" key={article.id}>
-                <div className="article-source">
-                  <div className="source-logo">
-                    <span>{article.source}</span>
-                  </div>
-                </div>
-
-                <div className="article-image">
-                  <img src={article.image || "/placeholder.svg"} alt={article.title} />
-                </div>
-
-                <div className="article-time">{article.timeAgo}</div>
-
-                <h2 className="article-title">{article.title}</h2>
-
-                <div className="article-author">
-                  <span className="source-name">{article.source}</span> - By {article.author}
-                </div>
-
-                <p className="article-content">{article.content}</p>
-
+            {savedArticles.map((article, idx) => (
+              <div key={idx} className="article-card">
+                <img src={article.image || "/placeholder.svg"} alt={article.title} />
+                <h2>{article.title}</h2>
+                <p>{article.description}</p>
+                <a href={article.url} target="_blank" rel="noreferrer">
+                  Read full article
+                </a>
                 <div className="article-actions">
-                  <button className="action-button" onClick={() => toggleArticleExpansion(article.id)}>
-                    <Check size={16} />
-                  </button>
-
-                  <button
-                    className={`action-button ${article.bookmarked ? "active" : ""}`}
-                    onClick={() => toggleBookmark(article.id)}
-                  >
-                    <Bookmark size={16} fill={article.bookmarked ? "#ff5722" : "none"} />
-                  </button>
-
-                  <button className="action-button" onClick={() => shareArticle(article.id)}>
+                  <button onClick={() => shareArticle(article)}>
                     <Share size={16} />
+                  </button>
+                  <button disabled>
+                    <Bookmark size={16} fill="blue" />
                   </button>
                 </div>
               </div>
             ))}
           </div>
-        ) : (
-          <div className="no-articles">
-            <p>You have no saved articles</p>
-            <button className="browse-button">Browse articles</button>
-          </div>
         )}
       </main>
     </div>
-  )
-}
+  );
+};
 
-export default ReadLater
+export default ReadLater;

@@ -5,27 +5,15 @@ import Header2 from "../components/Header2";
 import { useNavigate } from 'react-router-dom';
 
 function Categories() {
-  const [showModal, setShowModal] = useState(false);
+  const [showModal, setShowModal] = useState(true);
   const [selectedTopics, setSelectedTopics] = useState([]);
   const [showFoodDropdown, setShowFoodDropdown] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Check if user has already selected topics
-    const savedTopics = localStorage.getItem("selectedTopics");
-    
-    if (savedTopics) {
-      setSelectedTopics(JSON.parse(savedTopics));
-      navigate('/Aftersignup');
-    } else {
-      // Show welcome modal if no topics are saved
-      setShowModal(true);
-    }
-  }, []);
+ 
 
   const handleTopicSelection = (topics) => {
     setSelectedTopics(topics);
-    localStorage.setItem("selectedTopics", JSON.stringify(topics));
     setShowModal(false);
   };
 
@@ -73,11 +61,34 @@ function Categories() {
       }
     };
 
-    const handleContinue = () => {
-      if (localSelectedTopics.length >= 3) {
-        handleTopicSelection(localSelectedTopics);
+  const handleContinue = async () => {
+          if (localSelectedTopics.length >= 3) {
+    handleTopicSelection(localSelectedTopics);
+
+    try {
+      const token = localStorage.getItem("token"); // Assuming you save it at login
+      const response = await fetch("http://localhost:5000/api/save-categories", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ selectedCategory: localSelectedTopics }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("Categories saved:", data.message);
+        navigate("/Aftersignup");
+      } else {
+        console.error("Failed to save categories:", data.message);
       }
-    };
+    } catch (error) {
+      console.error("Error saving categories:", error);
+    }
+  }
+};
+
 
     return (
       <div className="modal-overlay">
@@ -101,14 +112,12 @@ function Categories() {
                 </button>
               ))}
             </div>
-
-            <Link to="/Aftersignup"><button
-              className={`continue-button ${localSelectedTopics.length >= 3 ? "active" : "disabled"}`}
-              onClick={handleContinue}
-              disabled={localSelectedTopics.length < 3}
-            >
-              Continue
-            </button></Link>
+              <button
+                  className={`continue-button ${localSelectedTopics.length >= 3 ? "active" : "disabled"}`}
+                  onClick={handleContinue}
+                  disabled={localSelectedTopics.length < 3}>Continue
+              </button>
+            
           </div>
         </div>
       </div>

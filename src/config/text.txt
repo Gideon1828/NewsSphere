@@ -1,0 +1,23 @@
+## 1. **Body Text (16-18px)**
+
+```css
+font-family: "Georgia"
+```
+
+## 2. **Headlines (28-48px)**
+
+```css
+font-family: "Times New Roman"
+```
+
+## 3. **Subheadings (20-24px)**
+
+```css
+font-family: -apple-system,
+```
+
+## 4. **Metadata/Captions (13-14px)**
+
+```css
+font-family: -apple-system,
+```

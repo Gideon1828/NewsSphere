@@ -1,0 +1,480 @@
+/* CSS Variables for consistent theming */
+:root {
+  --primary-color: #1a1a1a;
+  --secondary-color: #666;
+  --accent-color: #ff6b35;
+  --background-color: #ffffff;
+  --light-gray: #f8f9fa;
+  --border-color: #e1e5e9;
+  --text-primary: #2c3e50;
+  --text-secondary: #7f8c8d;
+  --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.15);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--background-color);
+}
+
+/* Container */
+.article-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: var(--transition);
+}
+
+.article-container.fade-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Header */
+.article-header {
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 40px;
+}
+
+.news-source {
+  display: flex;
+  align-items: center;
+}
+
+.cnbc-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--primary-color);
+  transition: var(--transition);
+}
+
+.cnbc-logo:hover {
+  transform: translateX(5px);
+}
+
+.logo-icon {
+  font-size: 20px;
+}
+
+.logo-text {
+  font-size: 18px;
+  letter-spacing: 0.5px;
+}
+
+/* Main Article */
+.article-main {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Article Title */
+.article-title {
+  font-family: "Times New Roman", Times, Georgia, serif;
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--primary-color);
+  margin-bottom: 30px;
+  letter-spacing: -0.5px;
+}
+
+/* Article Image */
+.article-image-container {
+  margin: 40px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-medium);
+  transform: scale(0.95);
+  transition: var(--transition);
+}
+
+.article-image-container.scale-in {
+  transform: scale(1);
+}
+
+.article-image {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: var(--transition);
+}
+
+.article-image:hover {
+  transform: scale(1.02);
+}
+
+/* Article Meta */
+.article-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 30px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.source {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+.separator {
+  color: var(--border-color);
+}
+
+.author {
+  font-style: italic;
+}
+
+.timestamp {
+  margin-left: auto;
+  font-size: 13px;
+}
+
+/* Article Body */
+.article-body {
+  margin-bottom: 60px;
+}
+
+.article-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.article-text {
+  font-size: 18px;
+  line-height: 1.8;
+  color: var(--text-primary);
+}
+
+.article-paragraph {
+  margin-bottom: 24px;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.article-paragraph:first-letter {
+  font-size: 3.5em;
+  font-family: "Times New Roman", Times, Georgia, serif;
+  font-weight: 700;
+  float: left;
+  line-height: 0.8;
+  margin: 8px 8px 0 0;
+  color: var(--accent-color);
+}
+
+/* Sidebar */
+.article-sidebar {
+  background: var(--light-gray);
+  padding: 30px;
+  border-radius: 12px;
+  border-left: 4px solid var(--accent-color);
+  position: sticky;
+  top: 20px;
+}
+
+.sidebar-text {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Related Articles */
+.related-articles {
+  background: var(--light-gray);
+  padding: 50px 40px;
+  border-radius: 16px;
+  margin-top: 60px;
+}
+
+.related-title {
+  font-family: "Times New Roman", Times, Georgia, serif;
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 40px;
+  color: var(--primary-color);
+  text-align: center;
+}
+
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin-bottom: 50px;
+}
+
+.related-item {
+  display: flex;
+  gap: 15px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-light);
+  transition: var(--transition);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideInUp 0.6s ease forwards;
+}
+
+.related-item:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-medium);
+}
+
+.related-image {
+  width: 80px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.related-content {
+  flex: 1;
+}
+
+.related-item-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  color: var(--primary-color);
+}
+
+.related-source {
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Read More Button */
+.read-more-btn {
+  display: block;
+  margin: 0 auto;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 15px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.read-more-btn:hover {
+  background: #e55a2b;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+/* Animations */
+@keyframes slideInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-up {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideInUp 0.8s ease forwards;
+}
+
+.scale-in {
+  animation: scaleIn 0.8s ease forwards;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 107, 53, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 107, 53, 0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .article-container {
+    padding: 0 15px;
+  }
+
+  .article-layout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .article-sidebar {
+    position: static;
+    order: -1;
+  }
+
+  .article-text {
+    font-size: 16px;
+  }
+
+  .related-articles {
+    padding: 30px 20px;
+  }
+
+  .related-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .related-item {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .related-image {
+    width: 100%;
+    height: 150px;
+  }
+
+  .article-meta {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .timestamp {
+    margin-left: 0;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .article-title {
+    font-size: 24px;
+  }
+
+  .related-title {
+    font-size: 24px;
+  }
+
+  .article-paragraph:first-letter {
+    font-size: 2.5em;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .related-articles,
+  .read-more-btn {
+    display: none;
+  }
+
+  .article-container {
+    max-width: none;
+    padding: 0;
+  }
+
+  .article-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Dark mode support */
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --primary-color: #ffffff;
+    --secondary-color: #b0b0b0;
+    --background-color: #1a1a1a;
+    --light-gray: #2a2a2a;
+    --border-color: #404040;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+  }
+
+  .related-item {
+    background: #2a2a2a;
+  }
+} */
+/* Footer */
+  .footer {
+    margin-top: auto;
+    padding: 20px;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+  }
+  
+  .footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 15px;
+  }
+  
+  .footer-link {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    transition: color 0.2s ease;
+  }
+  
+  .footer-link:hover {
+    color: #ff5722;
+  }
+  
+  .copyright {
+    font-size: 14px;
+    color: #666;
+  }
+  
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for keyboard navigation */
+.read-more-btn:focus,
+.related-item:focus {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
