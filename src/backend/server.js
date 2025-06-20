@@ -217,30 +217,43 @@ app.post('/api/save-notification', authenticateToken, async (req, res) => {
 app.post('/api/toggle-bookmark', authenticateToken, async (req, res) => {
   try {
     const userId = req.user.userId;
-    const { title } = req.body;
+    const { source, title, description, url, image, publishedAt } = req.body;
 
-    if (!title) return res.status(400).json({ message: "Article Title is required." });
+    if (!title || !url || !publishedAt) {
+      return res.status(400).json({ message: "Missing required article fields." });
+    }
 
     const userRef = db.collection("users").doc(userId);
     const userDoc = await userRef.get();
-    const userData = userDoc.data();
 
+    if (!userDoc.exists) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const userData = userDoc.data();
     let updatedBookmarks = userData.readLaterNews || [];
 
-    if (updatedBookmarks.includes(title)) {
-      updatedBookmarks = updatedBookmarks.filter(item => item !== title); // Remove
+    // Check if already bookmarked by URL
+    const alreadyBookmarked = updatedBookmarks.some(article => article.url === url);
+
+    if (alreadyBookmarked) {
+      // Remove the article
+      updatedBookmarks = updatedBookmarks.filter(article => article.url !== url);
     } else {
-      updatedBookmarks.push(title); // Add
+      // Add the article
+      updatedBookmarks.push({ source, title, description, url, image, publishedAt });
     }
 
     await userRef.update({ readLaterNews: updatedBookmarks });
 
     return res.status(200).json({ message: "Bookmark updated.", readLaterNews: updatedBookmarks });
+
   } catch (err) {
     console.error("Bookmark toggle error:", err);
-    res.status(500).json({ message: "Server error." });
+    return res.status(500).json({ message: "Server error." });
   }
 });
+
 
 
 

@@ -19,8 +19,8 @@ const Aftersignup = () => {
   const location = useLocation();
 
   const checkIfBookmarked = (article) => {
-    return bookmarkedSet.has(article.title.trim());
-  };
+  return bookmarkedArticles.some(a => a.url === article.url);
+};
 
   useEffect(() => {
     if (location.state && location.state.topic) {
@@ -85,28 +85,30 @@ const Aftersignup = () => {
   }, [token]);
 
   const handleBookmark = async (e, article) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const title = article.title.trim();
-    const isBookmarked = bookmarkedArticles.includes(title);
+  const isBookmarked = bookmarkedArticles.some(a => a.url === article.url);
 
-    try {
-      const res = await axios({
-        url: "http://localhost:5000/api/toggle-bookmark",
-        method: "POST",
-        data: { title },
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (isBookmarked) {
-        setBookmarkedArticles(prev => prev.filter(t => t !== title));
-      } else {
-        setBookmarkedArticles(prev => [...prev, title]);
-      }
-    } catch (err) {
-      console.error("Bookmark error:", err);
-    }
+  const payload = {
+    source:article.source.name,
+    title: article.title,
+    description: article.description,
+    url: article.url,
+    image: article.image,
+    publishedAt: article.publishedAt,
   };
+
+  try {
+    const res = await axios.post("http://localhost:5000/api/toggle-bookmark", payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Update bookmarks with the response (cleaner approach)
+    setBookmarkedArticles(res.data.readLaterNews || []);
+  } catch (err) {
+    console.error("Bookmark error:", err);
+  }
+};
 
   const handleShare = (e, index) => {
     e.preventDefault();
@@ -128,8 +130,8 @@ const Aftersignup = () => {
   navigate("/Readarticle", { state: { article } });
 };
 
-  const bookmarkedSet = new Set(bookmarkedArticles.map(t => t.trim()));
-
+  /* const bookmarkedSet = new Set(bookmarkedArticles.map(t => t.trim()));
+ */
   return (
     <div className="news-container">
       <Header2 onTopicSelect={handleTopicSelect} />

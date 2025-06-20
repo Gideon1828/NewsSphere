@@ -69,8 +69,12 @@ const Readarticle = () => {
   return (
     <div>
       <Header2
-        activeTopic={topicclicked}
-      />
+  activeTopic={topicclicked}
+  onTopicSelect={(topic) => {
+    settopicclicked(topic);
+    navigate("/Aftersignup", { state: { topic } });
+  }}
+/>
 
       <div className={`article-container ${isVisible ? "fade-in" : ""}`}>
         <header className="article-header">
@@ -78,10 +82,10 @@ const Readarticle = () => {
             <div className="cnbc-logo">
               <img
                 className="source-avatar"
-                src={`https://www.google.com/s2/favicons?sz=32&domain_url=${article.source.url}`}
-                alt={article.source.name}
+                src={`https://www.google.com/s2/favicons?sz=32&domain_url=${article.source.url || article.url}`}
+                alt={article.source.name || article.source || "Unknown Source"}
               />
-              <span className="logo-text">{article.source?.name || "Unknown Source"}</span>
+              <span className="logo-text">{article.source?.name ||article.source  || "Unknown Source"}</span>
             </div>
           </div>
         </header>
@@ -115,6 +119,14 @@ const Readarticle = () => {
                     <p className="sidebar-text">
                       {article.description || "No additional summary available."}
                     </p>
+                     <a
+    href={article.url}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="read-full-btn"
+  >
+    Read Full Article
+  </a>
                   </div>
                 </div>
               </div>

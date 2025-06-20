@@ -5,57 +5,46 @@ import { Bookmark, MoreHorizontal, Trash2, Share } from "lucide-react";
 import "./ReadLater.css";
 import Header2 from "../components/Header2";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const ReadLater = () => {
   const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const [sortOption, setSortOption] = useState("latest");
-  const menuRef = useRef(null);
   const [savedArticles, setSavedArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const menuRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-  const fetchSavedArticles = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
+    const fetchSavedArticles = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
-      const prefsRes = await axios.get("http://localhost:5000/api/user-preferences", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const savedTitles = prefsRes.data.readLaterNews || [];
+        const res = await axios.get("http://localhost:5000/api/user-preferences", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
-      // Map titles to article-like objects with placeholders
-      const articles = savedTitles.map((title, idx) => ({
-        title,
-        description: "No description available.",
-        url: "#", // No URL saved, so just a placeholder or you can remove the link
-        image: "/placeholder.svg",
-      }));
+        const articles = res.data.readLaterNews || [];
+        setSavedArticles(articles);
+      } catch (err) {
+        console.error("Error fetching saved articles:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      setSavedArticles(articles);
-    } catch (err) {
-      console.error("Error fetching saved articles:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchSavedArticles();
+  }, []);
 
-  fetchSavedArticles();
-}, []);
-
-
-  // Close sort menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target) && !event.target.closest(".sort-button")) {
         setSortMenuOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const toggleSortMenu = () => setSortMenuOpen(!sortMenuOpen);
@@ -63,11 +52,7 @@ const ReadLater = () => {
   const handleSortChange = (option) => {
     setSortOption(option);
     const sorted = [...savedArticles];
-
-    if (option === "oldest") {
-      sorted.reverse();
-    }
-
+    if (option === "oldest") sorted.reverse();
     setSavedArticles(sorted);
     setSortMenuOpen(false);
   };
@@ -88,6 +73,43 @@ const ReadLater = () => {
   const shareArticle = (article) => {
     alert(`Sharing: ${article.title}`);
   };
+
+  const openArticle = (article) => {
+  // push a new route and attach the article in location.state
+  navigate("/Readarticle", { state: { article } });
+};
+
+const removeBookmark = async (article) => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    await axios.post(
+      "http://localhost:5000/api/toggle-bookmark",
+      {
+        title: article.title,
+        url: article.url,
+        publishedAt: article.publishedAt,
+        source: article.source || "Unknown",  // optional but good to pass
+        description: article.description || "",
+        image: article.image || ""
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    // Remove from local state
+    setSavedArticles((prev) =>
+      prev.filter((a) => a.url !== article.url)
+    );
+  } catch (err) {
+    console.error("Error removing bookmark:", err);
+  }
+};
+
 
   if (loading) return <p>Loading saved articles...</p>;
 
@@ -151,20 +173,33 @@ const ReadLater = () => {
         ) : (
           <div className="articles-grid">
             {savedArticles.map((article, idx) => (
-              <div key={idx} className="article-card">
+              <div key={idx} className="article-card" onClick={() => openArticle(article)} style={{ cursor: "pointer" }}>
+                 <img
+                className="source-avatar"
+                src={`https://www.google.com/s2/favicons?sz=32&domain_url=${article.url}`}
+                alt={article.source}
+              />
+              <span className="source-name">{article.source}</span>
                 <img src={article.image || "/placeholder.svg"} alt={article.title} />
                 <h2>{article.title}</h2>
-                <p>{article.description}</p>
-                <a href={article.url} target="_blank" rel="noreferrer">
-                  Read full article
-                </a>
+                <p>{article.description || "No description available."}</p>
+                <p className="article-time">
+                  {article.publishedAt ? new Date(article.publishedAt).toLocaleString() : "Unknown time"}
+                </p>
                 <div className="article-actions">
-                  <button onClick={() => shareArticle(article)}>
+                  <button onClick={(e) => { e.stopPropagation(); shareArticle(article); }}>
                     <Share size={16} />
                   </button>
-                  <button disabled>
-                    <Bookmark size={16} fill="blue" />
-                  </button>
+                  <button
+  onClick={(e) => {
+    e.stopPropagation();
+    removeBookmark(article);
+  }}
+>
+  <Bookmark size={16} fill="blue" />
+</button>
+
+
                 </div>
               </div>
             ))}
