@@ -6,46 +6,63 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState('form'); // 'form' or 'otp'
 
   const navigate = useNavigate();
 
-  const handleSignup = async () => {
+  const handleSendOtp = async () => {
     if (!email || !fullName || !password) {
       alert('Please fill all fields.');
       return;
     }
 
     try {
-      const response = await fetch('http://localhost:5000/api/signup', {
+      const response = await fetch('http://localhost:5000/api/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, fullName, password }),
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
 
-      if (response.ok) 
-        {
-      alert(data.message);
-
-      // ✅ Correct way to store token
-      localStorage.setItem("token", data.token);
-      // ✅ Store user info (this includes fullName)
-      localStorage.setItem("user", JSON.stringify(data.user));
-
-      // ✅ Check if token is actually there
-      if (!data.token) {
-        console.error("No token found. User may not be logged in.");
-        return;
-      }
-
-        navigate('/Categories'); // or '/Aftersignup' depending on your flow
+      if (response.ok) {
+        alert(data.message); // e.g. "OTP sent to your email"
+        setStep('otp');
       } else {
         alert(data.message);
       }
     } catch (error) {
-      console.error('Signup error:', error);
-      alert('Something went wrong. Please try again later.');
+      console.error('Send OTP error:', error);
+      alert('Something went wrong. Please try again.');
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp) {
+      alert("Please enter the OTP.");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:5000/api/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, fullName, password, otp }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        navigate('/Categories');
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      console.error('Verify OTP error:', error);
+      alert('Something went wrong during verification.');
     }
   };
 
@@ -69,29 +86,45 @@ const Signup = () => {
         </div>
 
         <div className="signup-right">
-          <input
-            type="email"
-            placeholder="Email"
-            className="signup-input"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="Full name"
-            className="signup-input"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="signup-input"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
+          {step === 'form' ? (
+            <>
+              <input
+                type="email"
+                placeholder="Email"
+                className="signup-input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <input
+                type="text"
+                placeholder="Full name"
+                className="signup-input"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                className="signup-input"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
 
-          <button className="signup-button" onClick={handleSignup}>Continue</button>
+              <button className="signup-button" onClick={handleSendOtp}>Continue</button>
+            </>
+          ) : (
+            <>
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                className="signup-input"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+              />
+
+              <button className="signup-button" onClick={handleVerifyOtp}>Verify OTP</button>
+            </>
+          )}
 
           <p className="signup-or">or sign up with</p>
           <div className="signup-icons">

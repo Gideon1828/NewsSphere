@@ -11,6 +11,9 @@ dotenv.config();
 const API= process.env.GNEWS_API_KEY
 const PORT = process.env.PORT || 5000;
 
+const nodemailer = require("nodemailer");
+const otpStore = new Map();
+
 const serviceAccount = require("../config/firebaseServiceKey.json");
 
 admin.initializeApp({
@@ -36,6 +39,7 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
+
 
 // Default Route
 app.get("/", (req, res) => {
@@ -254,7 +258,126 @@ app.post('/api/toggle-bookmark', authenticateToken, async (req, res) => {
   }
 });
 
+app.post("/api/send-otp", async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email is required." });
 
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = Date.now() + 5 * 60 * 1000; // 5 mins
+
+  otpStore.set(email, { otp, expiresAt });
+
+  // Configure your email service (Gmail here)
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER, // your email
+      pass: process.env.EMAIL_PASS, // app password (not your login password)
+    },
+  });
+
+  const mailOptions = {
+    from: `"NewsSphere" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Your OTP for NewsSphere Signup",
+    text: `Your OTP code is ${otp}. It expires in 5 minutes.`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "OTP sent to your email." });
+  } catch (error) {
+    console.error("OTP Send Error:", error);
+    res.status(500).json({ message: "Failed to send OTP." });
+  }
+});
+
+app.post("/api/verify-otp", async (req, res) => {
+  const { email, fullName, password, otp } = req.body;
+  if (!email || !fullName || !password || !otp) {
+    return res.status(400).json({ message: "All fields are required." });
+  }
+
+  const record = otpStore.get(email);
+  if (!record || record.otp !== otp || Date.now() > record.expiresAt) {
+    return res.status(400).json({ message: "Invalid or expired OTP." });
+  }
+
+  try {
+    const userSnapshot = await db.collection("users").where("email", "==", email).get();
+    if (!userSnapshot.empty) {
+      return res.status(400).json({ message: "User already exists." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUserRef = await db.collection("users").add({
+      email,
+      fullName,
+      password: hashedPassword,
+      createdAt: new Date(),
+      selectedCategory: null,
+      isNotificationOn: false,
+      readLaterNews: [],
+    });
+
+    const token = jwt.sign(
+      { userId: newUserRef.id, email, fullName },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || '1d' }
+    );
+
+    // Cleanup used OTP
+    otpStore.delete(email);
+
+    res.status(201).json({
+      message: "User registered successfully.",
+      token,
+      user: {
+        id: newUserRef.id,
+        email,
+        fullName,
+      },
+    });
+  } catch (error) {
+    console.error("OTP Verification Error:", error);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+// Reset password with OTP (forgot password flow)
+app.post("/api/reset-password", async (req, res) => {
+  const { email, otp, newPassword } = req.body;
+
+  if (!email || !otp || !newPassword) {
+    return res.status(400).json({ message: "Email, OTP, and new password are required." });
+  }
+
+  const record = otpStore.get(email);
+  if (!record || record.otp !== otp || Date.now() > record.expiresAt) {
+    return res.status(400).json({ message: "Invalid or expired OTP." });
+  }
+
+  try {
+    const userSnapshot = await db.collection("users").where("email", "==", email).get();
+    if (userSnapshot.empty) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    const userDoc = userSnapshot.docs[0];
+    const userRef = db.collection("users").doc(userDoc.id);
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await userRef.update({ password: hashedPassword });
+
+    otpStore.delete(email); // Cleanup OTP
+
+    res.status(200).json({ message: "Password reset successful. You can now log in." });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res.status(500).json({ message: "Server error while resetting password." });
+  }
+});
 
 
 
