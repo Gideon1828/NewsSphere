@@ -23,7 +23,7 @@ const Header2 = ({ onTopicSelect ,topicclicked }) => {
 
 
   const modalRef = useRef(null);
-
+  const [selectedLang, setSelectedLang] = useState('en'); // default language
   const [userTopics, setUserTopics] = useState([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
@@ -79,6 +79,19 @@ const Header2 = ({ onTopicSelect ,topicclicked }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  useEffect(() => {
+  const savedLang = localStorage.getItem('lang');
+  if (savedLang) setSelectedLang(savedLang);
+}, []);
+
+const handleLanguageChange = (e) => {
+  const lang = e.target.value;
+  setSelectedLang(lang);
+  localStorage.setItem('lang', lang);
+  window.dispatchEvent(new CustomEvent('languageChanged', { detail: lang }));
+};
+
 
   // Handle notification preference
   const handleNotificationPreference = async (enabled) => {
@@ -290,6 +303,24 @@ const Header2 = ({ onTopicSelect ,topicclicked }) => {
                 <button className="dropdown-item" onClick={toggleDarkMode}>
                   {isDarkMode && <Check size={24} />}
                   <span>Dark mode</span>
+                </button>
+                <button  className="dropdown-item">
+                  <select
+    id="language"
+    value={selectedLang}
+    onChange={handleLanguageChange}
+    style={{ padding: "3px", borderRadius: "6px" }}
+  >
+    <option value="en">English</option>
+    <option value="hi">Hindi</option>
+    <option value="es">Spanish</option>
+    <option value="fr">French</option>
+    <option value="de">German</option>
+    <option value="zh">Chinese</option>
+    <option value="ar">Arabic</option>
+  </select>
+                  <label htmlFor="language" style={{ marginRight: "8px" }}>language</label>
+  
                 </button>
                 <button className="dropdown-item" onClick={() => handleNavigation("privacy")}>
                   Privacy policy

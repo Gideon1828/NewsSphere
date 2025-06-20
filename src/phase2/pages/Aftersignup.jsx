@@ -1,25 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import './Aftersignup.css';
 import { Bookmark, ChevronDown, Share, Loader } from 'lucide-react';
-
 import Header2 from '../components/Header2';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-
-
+import topicTranslations from './topicTranslations';
 const Aftersignup = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [userName, setUserName] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("For You");
   const [articlesToShow, setArticlesToShow] = useState(3);
-  const [newsArticles, setNewsArticles] = useState([]); 
+  const [newsArticles, setNewsArticles] = useState([]);
   const [bookmarkedArticles, setBookmarkedArticles] = useState([]);
+  const [preferredLang, setPreferredLang] = useState(localStorage.getItem('lang') || 'en');
+
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const location = useLocation();
 
   const checkIfBookmarked = (article) => {
-  return bookmarkedArticles.some(a => a.url === article.url);
+    return bookmarkedArticles.some(a => a.url === article.url);
+  };
+
+  const getLocalizedTopic = (topic, lang) => {
+    const key = topic.toLowerCase();
+    return topicTranslations[key]?.[lang] || topic;
 };
 
   useEffect(() => {
@@ -33,15 +38,37 @@ const Aftersignup = () => {
   };
 
   useEffect(() => {
+    const interval = setInterval(() => {
+      const lang = localStorage.getItem('lang') || 'en';
+      if (lang !== preferredLang) {
+        setPreferredLang(lang);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [preferredLang]);
+
+  useEffect(() => {
     const fetchNews = async () => {
       try {
         setIsLoading(true);
+        const localizedTopic = getLocalizedTopic(selectedTopic, preferredLang);
+        console.log("Fetching news with lang:", preferredLang, "topic:", localizedTopic);
+
         const response = await fetch(
-          `https://gnews.io/api/v4/search?q=${selectedTopic}&lang=en&country=in&max=30&apikey=e199c04b5ba393d25905d7f978036249`
+          `https://gnews.io/api/v4/search?q=${localizedTopic}&lang=${preferredLang}&max=30&apikey=553dc14c7832190909f27b1b12fa5252`
         );
         const data = await response.json();
-        if (data.articles) {
+
+        if (data.articles && data.articles.length > 0) {
           setNewsArticles(data.articles);
+        } else {
+          // Fallback to top headlines
+          console.warn("No articles found. Fetching top headlines...");
+          const fallback = await fetch(
+            `https://gnews.io/api/v4/top-headlines?lang=${preferredLang}&max=30&apikey=e199c04b5ba393d25905d7f978036249`
+          );
+          const fallbackData = await fallback.json();
+          setNewsArticles(fallbackData.articles || []);
         }
       } catch (error) {
         console.error("Error fetching news:", error);
@@ -51,7 +78,7 @@ const Aftersignup = () => {
     };
 
     fetchNews();
-  }, [selectedTopic]);
+  }, [selectedTopic, preferredLang]);
 
   useEffect(() => {
     const storedData = localStorage.getItem('user');
@@ -63,7 +90,6 @@ const Aftersignup = () => {
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1500);
-    
     return () => clearTimeout(timer);
   }, []);
 
@@ -85,34 +111,24 @@ const Aftersignup = () => {
   }, [token]);
 
   const handleBookmark = async (e, article) => {
-  e.preventDefault();
-
-  const isBookmarked = bookmarkedArticles.some(a => a.url === article.url);
-
-  const payload = {
-    source:article.source.name,
-    title: article.title,
-    description: article.description,
-    url: article.url,
-    image: article.image,
-    publishedAt: article.publishedAt,
-  };
-
-  try {
-    const res = await axios.post("http://localhost:5000/api/toggle-bookmark", payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    // Update bookmarks with the response (cleaner approach)
-    setBookmarkedArticles(res.data.readLaterNews || []);
-  } catch (err) {
-    console.error("Bookmark error:", err);
-  }
-};
-
-  const handleShare = (e, index) => {
     e.preventDefault();
-    console.log(`Shared article ${index}`);
+    const payload = {
+      source: article.source.name,
+      title: article.title,
+      description: article.description,
+      url: article.url,
+      image: article.image,
+      publishedAt: article.publishedAt,
+    };
+
+    try {
+      const res = await axios.post("http://localhost:5000/api/toggle-bookmark", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setBookmarkedArticles(res.data.readLaterNews || []);
+    } catch (err) {
+      console.error("Bookmark error:", err);
+    }
   };
 
   const handleExpand = (e, index) => {
@@ -124,21 +140,15 @@ const Aftersignup = () => {
     setArticlesToShow((prev) => prev + 3);
   };
 
-
   const openArticle = (article) => {
-  // push a new route and attach the article in location.state
-  navigate("/Readarticle", { state: { article } });
-};
+    navigate("/Readarticle", { state: { article } });
+  };
 
-  /* const bookmarkedSet = new Set(bookmarkedArticles.map(t => t.trim()));
- */
   return (
     <div className="news-container">
       <Header2 onTopicSelect={handleTopicSelect} />
 
-      <div className="welcome-message">
-        Welcome {userName}!
-      </div>
+      <div className="welcome-message">Welcome {userName}!</div>
 
       <div className="for-you-section">
         <h1 className="for-you-title">
@@ -150,8 +160,8 @@ const Aftersignup = () => {
 
       <div className="news-grid">
         {newsArticles.slice(0, articlesToShow).map((article, index) => (
-          <div className="news-card" key={index} >
-            <div onClick={() => openArticle(article)}style={{cursor:"pointer" }} className="news-source">
+          <div className="news-card" key={index}>
+            <div onClick={() => openArticle(article)} className="news-source" style={{ cursor: "pointer" }}>
               <img
                 className="source-avatar"
                 src={`https://www.google.com/s2/favicons?sz=32&domain_url=${article.source.url}`}
@@ -159,32 +169,25 @@ const Aftersignup = () => {
               />
               <span className="source-name">{article.source.name}</span>
             </div>
-            <div onClick={() => openArticle(article)}style={{cursor:"pointer" }} className="news-image">
+            <div onClick={() => openArticle(article)} className="news-image" style={{ cursor: "pointer" }}>
               <img src={article.image || "/placeholder.svg"} alt="News thumbnail" />
             </div>
-            <div onClick={() => openArticle(article)}style={{cursor:"pointer" }} className="news-time">
+            <div onClick={() => openArticle(article)} className="news-time" style={{ cursor: "pointer" }}>
               {new Date(article.publishedAt).toLocaleTimeString()} | {new Date(article.publishedAt).toLocaleDateString()}
             </div>
-            <h2 onClick={() => openArticle(article)}style={{cursor:"pointer" }} className="news-title">{article.title}</h2>
-            <div onClick={() => openArticle(article)}style={{cursor:"pointer" }} className="news-author">
+            <h2 onClick={() => openArticle(article)} className="news-title" style={{ cursor: "pointer" }}>{article.title}</h2>
+            <div onClick={() => openArticle(article)} className="news-author" style={{ cursor: "pointer" }}>
               <span className="source-name">{article.source.name}</span> - By {article.author || "Unknown"}
             </div>
-            <p onClick={() => openArticle(article)}style={{cursor:"pointer" }} className="news-content">{article.description}</p>
+            <p onClick={() => openArticle(article)} className="news-content" style={{ cursor: "pointer" }}>{article.description}</p>
             <div className="news-actions">
-              <button className="action-button" onClick={(e) => {e.stopPropagation(); handleExpand(e, index);
-              }}>
+              <button className="action-button" onClick={(e) => { e.stopPropagation(); handleExpand(e, index); }}>
                 <ChevronDown size={16} />
               </button>
-              <button
-                className="action-button"
-                onClick={(e) => handleBookmark(e, article)}
-              
-                style={{ color: checkIfBookmarked(article) ? "blue" : "black" }}
-              >
+              <button className="action-button" onClick={(e) => handleBookmark(e, article)} style={{ color: checkIfBookmarked(article) ? "blue" : "black" }}>
                 <Bookmark fill={checkIfBookmarked(article) ? "blue" : "none"} />
               </button>
-              <button className="action-button" onClick={(e) => {e.stopPropagation(); handleExpand(e, index);
-              }}>
+              <button className="action-button" onClick={(e) => { e.stopPropagation(); handleExpand(e, index); }}>
                 <Share size={16} />
               </button>
             </div>

@@ -109,6 +109,7 @@
   animation: fadeIn 0.2s ease;
 }
 
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -257,6 +258,57 @@
 
 .dark-theme .dropdown-item:active {
   background-color: #555;
+}
+
+/* Language selector inside dropdown */
+.language-selector-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  width: 100%;
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+  font-size: 18px;
+  gap: 10px;
+}
+
+.language-selector-wrapper label {
+  font-size: 18px;
+  cursor: default;
+}
+
+.language-selector-wrapper select {
+  padding: 6px 12px;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.language-selector-wrapper select:hover {
+  border-color: #888;
+}
+
+.language-selector-wrapper select:focus {
+  border-color: #007aff;
+  outline: none;
+}
+
+/* Dark mode support for language dropdown */
+body.dark-mode .language-selector-wrapper {
+  border-bottom-color: #444;
+}
+
+body.dark-mode .language-selector-wrapper select {
+  background-color: #333;
+  color: #fff;
+  border-color: #555;
+}
+
+body.dark-mode .language-selector-wrapper select:hover {
+  border-color: #888;
 }
 
 /* Responsive styles */
