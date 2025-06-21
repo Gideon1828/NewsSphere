@@ -18,6 +18,15 @@ const Home = () => {
     { label: "Sports", value: "sports" },
   ];
 
+  const categoryToSubreddit = {
+    general: "news",
+    entertainment: "entertainment",
+    technology: "technology",
+    travel: "travel",
+    food: "food",
+    sports: "sports",
+  };
+
   const handleCategoryClick = (categoryValue) => {
     setActiveCategory(categoryValue);
     setArticlesToShow(6); // Reset article count on category change
@@ -27,24 +36,43 @@ const Home = () => {
     setArticlesToShow((prev) => prev + 3);
   };
 
-  // Fetch News on Category Change
-  useEffect(() => {
-    const fetchNews = async () => {
-      try {
-        const response = await fetch(
-          `https://gnews.io/api/v4/top-headlines?category=${activeCategory}&lang=en&country=in&max=30&apikey=553dc14c7832190909f27b1b12fa5252`
-        );
-        const data = await response.json();
-        if (data.articles) {
-          setArticles(data.articles);
-        }
-      } catch (error) {
-        console.error("Error fetching news:", error);
-      }
-    };
+ useEffect(() => {
+  const fetchArticles = async () => {
+    try {
+      const gnewsResponse = await fetch(
+        `https://gnews.io/api/v4/top-headlines?category=${activeCategory}&lang=en&country=in&max=20&apikey=553dc14c7832190909f27b1b12fa5252`
+      );
+      const gnewsData = await gnewsResponse.json();
+      const gnewsArticles = gnewsData.articles || [];
 
-    fetchNews();
-  }, [activeCategory]);
+      const redditResponse = await fetch(
+        `http://localhost:5000/api/reddit?subreddit=${activeCategory}&limit=10`
+      );
+      const redditData = await redditResponse.json();
+
+      const redditFormatted = Array.isArray(redditData)
+        ? redditData.map(post => ({
+            title: post.title,
+            url: post.url,
+            image: post.image || "/placeholder.png",
+            publishedAt: post.publishedAt || new Date().toISOString(),
+            source: { name: post.source || "Reddit", url: post.url },
+          }))
+        : [];
+
+      const combined = [...gnewsArticles, ...redditFormatted];
+      const shuffled = combined.sort(() => Math.random() - 0.5);
+
+      setArticles(shuffled);
+    } catch (error) {
+      console.error("Error fetching combined news:", error);
+    }
+  };
+
+  fetchArticles();
+}, [activeCategory]);
+
+
 
   return (
     <div>
@@ -92,7 +120,12 @@ const Home = () => {
                   />
                   <p className="time">{new Date(article.publishedAt).toLocaleString()}</p>
                   <h3 className="title">{article.title}</h3>
-                  <p className="author">{article.source.name}</p>
+                  <p className="author">
+                    {article.source?.name}
+                    <span style={{ fontSize: "12px", color: "gray" }}>
+                      ({article.fromReddit ? "Reddit" : "GNews"})
+                    </span>
+                  </p>
                   <div className="card-actions">
                     <span>✔️</span>
                     <span>🔖</span>
