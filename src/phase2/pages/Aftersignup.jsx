@@ -98,7 +98,7 @@ const Aftersignup = () => {
       if (!token) return;
 
       try {
-        const res = await axios.get('http://localhost:5000/api/user-preferences', {
+        const res = await axios.get('https://newssphere-wxr1.onrender.com/api/user-preferences', {
           headers: { Authorization: `Bearer ${token}` },
         });
         setBookmarkedArticles(res.data.readLaterNews || []);
@@ -122,7 +122,7 @@ const Aftersignup = () => {
     };
 
     try {
-      const res = await axios.post("http://localhost:5000/api/toggle-bookmark", payload, {
+      const res = await axios.post("https://newssphere-wxr1.onrender.com/api/toggle-bookmark", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBookmarkedArticles(res.data.readLaterNews || []);

@@ -35,7 +35,7 @@ const Header2 = ({ onTopicSelect ,topicclicked }) => {
         const token = localStorage.getItem('token');
         if (!token) return; // user not logged in
 
-        const res = await fetch('http://localhost:5000/api/user-preferences', {
+        const res = await fetch('https://newssphere-wxr1.onrender.com/api/user-preferences', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('Failed to fetch user preferences');
@@ -100,7 +100,7 @@ const handleLanguageChange = (e) => {
     if (!token) return;
 
     // First, make API call
-    const res = await fetch('http://localhost:5000/api/save-notification', {
+    const res = await fetch('https://newssphere-wxr1.onrender.com/api/save-notification', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

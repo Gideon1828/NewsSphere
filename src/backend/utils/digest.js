@@ -47,7 +47,7 @@ const summarizeArticle = async (title, content) => {
       headers: {
         "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "http://localhost:5000",
+        "HTTP-Referer": "https://newssphere-wxr1.onrender.com",
         "X-Title": "NewsSphere AI Digest"
       }
     }

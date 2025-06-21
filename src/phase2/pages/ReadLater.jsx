@@ -21,7 +21,7 @@ const ReadLater = () => {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const res = await axios.get("http://localhost:5000/api/user-preferences", {
+        const res = await axios.get("https://newssphere-wxr1.onrender.com/api/user-preferences", {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -60,7 +60,7 @@ const ReadLater = () => {
   const clearAllArticles = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/api/clear-bookmarks", {}, {
+      await axios.post("https://newssphere-wxr1.onrender.com/api/clear-bookmarks", {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSavedArticles([]);
@@ -85,7 +85,7 @@ const removeBookmark = async (article) => {
     if (!token) return;
 
     await axios.post(
-      "http://localhost:5000/api/toggle-bookmark",
+      "https://newssphere-wxr1.onrender.com/api/toggle-bookmark",
       {
         title: article.title,
         url: article.url,

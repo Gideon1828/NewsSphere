@@ -67,7 +67,7 @@ function Categories() {
 
     try {
       const token = localStorage.getItem("token"); // Assuming you save it at login
-      const response = await fetch("http://localhost:5000/api/save-categories", {
+      const response = await fetch("https://newssphere-wxr1.onrender.com/api/save-categories", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

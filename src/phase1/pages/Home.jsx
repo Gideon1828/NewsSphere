@@ -46,7 +46,7 @@ const Home = () => {
       const gnewsArticles = gnewsData.articles || [];
 
       const redditResponse = await fetch(
-        `http://localhost:5000/api/reddit?subreddit=${activeCategory}&limit=10`
+        `https://newssphere-wxr1.onrender.com/api/reddit?subreddit=${activeCategory}&limit=10`
       );
       const redditData = await redditResponse.json();
 
