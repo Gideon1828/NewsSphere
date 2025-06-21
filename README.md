@@ -25,30 +25,36 @@
 
 - 🔔 **Notifications (Planned)**  
   Push notifications based on topic or breaking news (via Firebase Cloud Messaging).
+  
+- ✉️ AI-Based Daily Digest
+  Sends users a curated list of top articles around 7 AM daily, powered by AI.
+
+- 👾 Reddit Content Integration
+  Additionally fetches trending and relevant content from Reddit for broader news coverage.    
 
 ## 🌍 Live Site
 
--Not deployed Currently-Frontend: [newsphere.vercel.app](https://newsphere.vercel.app)  
--Not deployed Currently-Backend API: [newsphere-api.render.com](https://newsphere-api.render.com)
+-Frontend: [newsphere.vercel.app](https://newssphere-2025.vercel.app/)  
+-Backend API: [newsphere-api.render.com](https://newssphere-wxr1.onrender.com)
 
 
 ## 📁 Project Structure
 
 - client/
-├── src/
-│ ├── components/
-│ ├── pages/
-│ │ ├── Aftersignup.jsx
-│ ├── utils/
-│ │ └── topicTranslations.js
-│ ├── App.js
-│ └── index.js
+-├── src/
+-│ ├── components/
+-│ ├── pages/
+-│ │ ├── Aftersignup.jsx
+-│ ├── utils/
+-│ │ └── topicTranslations.js
+-│ ├── App.js
+-│ └── index.js
 
 - server/
-├── models/
-├── routes/
-├── controllers/
-├── server.js
+-├── models/
+-├── routes/
+-├── controllers/
+-├── server.js
 
 
 ## 🧠 Tech Stack
