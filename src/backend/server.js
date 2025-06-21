@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cron = require("node-cron");
 const { generateDigest } = require("./utils/digest");
-
+const axios = require("axios");
 const admin = require("./config/firebase"); // Adjust path if needed
 
 
@@ -395,6 +395,42 @@ cron.schedule("0 1 * * *", async () => {
   console.log("⏰ Running scheduled daily digest at 7:00 AM IST...");
   await generateDigest();
 });
+
+// 📥 Fetch Reddit posts from any subreddit (e.g., r/worldnews, r/technology)
+app.get("/api/reddit", async (req, res) => {
+  const { subreddit = "news", limit = 10 } = req.query;
+
+  try {
+    const response = await axios.get(`https://www.reddit.com/r/${subreddit}/hot.json?limit=${limit}`, {
+      headers: { "User-Agent": "NewsSphereBot/1.0" },
+    });
+
+    const posts = response.data.data.children.map(post => {
+      const data = post.data;
+
+      return {
+        title: data.title,
+        url: `https://reddit.com${data.permalink}`,
+        author: data.author || "Unknown",
+        publishedAt: new Date(data.created_utc * 1000).toISOString(),
+        source: `r/${subreddit}`, // Reddit source
+        image:
+          data.preview?.images?.[0]?.source?.url.replace(/&amp;/g, "&") ||
+          (data.thumbnail?.startsWith("http") ? data.thumbnail : null) ||
+          null,
+        description: data.selftext || "No description available.",
+      };
+    });
+
+    res.status(200).json(posts);
+  } catch (err) {
+    /* console.error("Reddit fetch error:", err.message); */
+    res.status(500).json({ message: "Failed to fetch from Reddit" });
+  }
+});
+
+
+
 
 
 
