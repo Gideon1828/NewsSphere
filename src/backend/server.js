@@ -1,9 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const admin = require("firebase-admin");
+
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const cron = require("node-cron");
+const { generateDigest } = require("./utils/digest");
+
+const admin = require("./config/firebase"); // Adjust path if needed
 
 
 const app = express();
@@ -14,11 +18,7 @@ const PORT = process.env.PORT || 5000;
 const nodemailer = require("nodemailer");
 const otpStore = new Map();
 
-const serviceAccount = require("../config/firebaseServiceKey.json");
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
 
 const db = admin.firestore();
 
@@ -378,6 +378,24 @@ app.post("/api/reset-password", async (req, res) => {
     res.status(500).json({ message: "Server error while resetting password." });
   }
 });
+
+// Manual route to trigger digest email
+app.get("/api/send-digest", async (req, res) => {
+  try {
+    await generateDigest();
+    res.send("✅ Digest sent successfully.");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("❌ Error generating digest.");
+  }
+});
+
+// Schedule a daily digest at 8 AM IST (2:30 AM UTC)
+cron.schedule("0 1 * * *", async () => {
+  console.log("⏰ Running scheduled daily digest at 7:00 AM IST...");
+  await generateDigest();
+});
+
 
 
 
