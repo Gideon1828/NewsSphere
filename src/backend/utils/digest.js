@@ -7,10 +7,14 @@ const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 // ✅ Initialize Firebase if not already
 if (!admin.apps.length) {
-  const serviceAccount = require(path.join(__dirname, "../config/firebaseServiceKey.json"));
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-  });
+  const serviceAccount = process.env.FIREBASE_SERVICE_KEY
+  ? JSON.parse(process.env.FIREBASE_SERVICE_KEY)
+  : require(path.join(__dirname, "../config/firebaseServiceKey.json")); // used only for local dev
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
+
 }
 
 const db = admin.firestore();
