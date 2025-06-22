@@ -1,7 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-
+const { extractKeywords } = require("./utils/tfidf");
+/* const { buildInterestProfile } = require("./utils/buildInterestProfile"); */
+const { cosineSimilarity } = require("./utils/cosineSimilarity");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cron = require("node-cron");
@@ -39,7 +41,6 @@ const authenticateToken = (req, res, next) => {
     next();
   });
 };
-
 
 // Default Route
 app.get("/", (req, res) => {
@@ -430,9 +431,249 @@ app.get("/api/reddit", async (req, res) => {
 });
 
 
+// ✅ Route: Track article click/read
+app.post("/api/track-click", authenticateToken, async (req, res) => {
+  try {
+    const { title, description, content } = req.body;
+    const userId = req.user.userId;
+
+    if (!title || !description) {
+      return res.status(400).json({ message: "Missing article content." });
+    }
+
+    const fullText = `${title} ${description} ${content || ""}`;
+    const keywords = extractKeywords(fullText);
+
+    await db.collection("users").doc(userId).collection("clickHistory").add({
+      title,
+      description,
+      content,
+      keywords,
+      timestamp: new Date(),
+    });
+
+    await rebuildInterestProfile(userId); // Automatically update interest profile
+
+    res.status(200).json({ message: "Click tracked and keywords extracted.", keywords });
+  } catch (err) {
+    console.error("Track click error:", err);
+    return res.status(500).json({ message: "Server error." });
+  }
+});
+
+// ✅ Rebuild interest profile (weighted keyword vector)
+const rebuildInterestProfile = async (userId) => {
+  const now = new Date();
+  const threeDaysAgo = new Date(now.setDate(now.getDate() - 3));
+
+  const snapshot = await db.collection("users")
+    .doc(userId)
+    .collection("clickHistory")
+    .get();
+
+  const recentClicks = [];
+  const batch = db.batch();
+
+  snapshot.docs.forEach(doc => {
+    const data = doc.data();
+    const docRef = doc.ref;
+
+    // If older than 3 days, mark for deletion
+    if (data.timestamp && data.timestamp.toDate() < threeDaysAgo) {
+      batch.delete(docRef);
+    } else {
+      recentClicks.push(data);
+    }
+  });
+
+  if (!snapshot.empty) {
+    await batch.commit(); // Delete old clicks
+  }
+
+  const interestVector = await buildInterestProfile(recentClicks);
+  await db.collection("users").doc(userId).update({
+    interestProfile: interestVector,
+    lastUpdated: new Date(),
+  });
+};
+
+
+const buildInterestProfile = async (clicks) => {
+  const keywordCount = {};
+  for (const click of clicks) {
+    const keywords = click.keywords || [];
+    for (const keyword of keywords) {
+      keywordCount[keyword] = (keywordCount[keyword] || 0) + 1;
+    }
+  }
+  return keywordCount;
+};
+
+// Modify rebuildInterestProfile
+// ✅ This is correct
+const cleanupOldClicks = async () => {
+  const snapshot = await db.collection("users").doc(userId).collection("clickHistory").get();
+
+  const now = Date.now();
+  const threeDaysAgo = now - (3 * 24 * 60 * 60 * 1000);
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+    if (data.timestamp && data.timestamp.toDate().getTime() < threeDaysAgo) {
+      await doc.ref.delete();
+    }
+  }
+};
+
+// ✅ Call it like this inside another async function or route
 
 
 
+// ✅ Recommend articles based on weighted profile
+app.post("/api/recommend-articles", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { articles } = req.body;
+
+    if (!Array.isArray(articles) || articles.length === 0) {
+      return res.status(400).json({ message: "Articles required." });
+    }
+
+    const userDoc = await db.collection("users").doc(userId).get();
+    const userVector = userDoc.data().interestProfile;
+
+    if (!userVector || Object.keys(userVector).length === 0) {
+      return res.status(400).json({ message: "No interest profile found." });
+    }
+
+    const scoredArticles = articles.map(article => {
+      const fullText = `${article.title} ${article.description} ${article.content || ""}`;
+      const keywords = extractKeywords(fullText, 10);
+
+      let score = 0;
+      for (const keyword of keywords) {
+        if (userVector[keyword]) {
+          score += userVector[keyword];
+        }
+      }
+
+      return { ...article, score };
+    });
+
+    const sorted = scoredArticles.sort((a, b) => b.score - a.score);
+    const topMatches = sorted.filter(a => a.score > 0).slice(0, 10);
+    res.status(200).json(topMatches);
+  } catch (err) {
+    console.error("Recommendation error:", err);
+    res.status(500).json({ message: "Server error." });
+  }
+});
+
+const topicCache = new Map();
+
+const getNewsForTopic = async (topic, apiKey, profileScore) => {
+  const cacheKey = topic.toLowerCase();
+  const cached = topicCache.get(cacheKey);
+
+  if (cached && Date.now() - cached.timestamp < 10 * 60 * 1000) {
+    return cached.data.map(article => ({
+      ...article,
+      source: article.source.name,
+      score: profileScore,
+    }));
+  }
+
+  const res = await axios.get(
+    `https://gnews.io/api/v4/search?q=${encodeURIComponent(topic)}&lang=en&max=10&apikey=${apiKey}`
+  );
+
+  const articles = res.data.articles.map(article => ({
+    ...article,
+    source: article.source.name,
+    score: profileScore,
+  }));
+
+  topicCache.set(cacheKey, { data: articles, timestamp: Date.now() });
+  return articles;
+};
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const fetchWithRetry = async (fn, retries = 3, delayMs = 1500) => {
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (i === retries - 1) throw err;
+      await delay(delayMs);
+    }
+  }
+};
+
+
+app.get("/api/smart-recommendations", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const userDoc = await db.collection("users").doc(userId).get();
+    const profile = userDoc.data().interestProfile || {};
+
+    const topTopics = Object.entries(profile)
+      .filter(([key]) => isNaN(key) && key.length > 2) // ❌ Filter bad topics
+      .sort((a, b) => b[1] - a[1])
+      .map(([topic]) => topic)
+      .slice(0, 5); // Top 5 valid interests
+
+    const results = [];
+    const keys = [process.env.GNEWS_API_KEY1, process.env.GNEWS_API_KEY2];
+    const API_KEY = keys[Math.floor(Math.random() * keys.length)];
+
+    for (const topic of topTopics) {
+      try {
+        const articles = await fetchWithRetry(() => getNewsForTopic(topic, API_KEY, profile[topic]));
+        results.push(...articles);
+        await delay(1500); // ⏱ Add delay between requests to avoid rate-limiting
+      } catch (err) {
+        console.error(`❌ GNews fetch failed for topic "${topic}":`, err.response?.data || err.message);
+      }
+    }
+
+    if (results.length === 0) {
+      return res.status(200).json([]); // Return empty safely
+    }
+
+    const sorted = results.sort((a, b) => b.score - a.score);
+    res.status(200).json(sorted.slice(0, 10));
+  } catch (err) {
+    console.error("❌ /smart-recommendations server error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+
+
+app.post("/api/rebuild-interest-profile", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    await rebuildInterestProfile(userId);
+    await cleanupOldClicks(userId);
+    return res.status(200).json({ message: "Profile rebuilt successfully." });
+  } catch (err) {
+    console.error("Profile rebuild error:", err);
+    return res.status(500).json({ message: "Failed to rebuild profile." });
+  }
+});
+
+// ✅ Get clicked articles to filter duplicates on frontend
+app.get("/api/get-clicked-articles", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const snapshot = await db.collection("users").doc(userId).collection("clickHistory").get();
+    const clicked = snapshot.docs.map(doc => doc.data());
+    res.status(200).json(clicked);
+  } catch (err) {
+    console.error("Error fetching clicked articles:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

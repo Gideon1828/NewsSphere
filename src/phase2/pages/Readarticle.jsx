@@ -47,6 +47,80 @@ const Readarticle = () => {
     setIsVisible(true);
   }, []);
 
+  useEffect(() => {
+  const trackArticleClick = async () => {
+    const alreadyTracked = sessionStorage.getItem(`tracked-${article?.url}`);
+    if (alreadyTracked) return;
+
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token || !article) {
+        console.warn("⛔ Missing token or article data.");
+        return;
+      }
+
+      const response = await fetch("http://localhost:5000/api/track-click", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+       body: JSON.stringify({
+        source:article.source?.name ||article.source,
+        title: article.title,
+        description: article.description,
+        content: article.content || article.fullText || "",
+        url: article.url, // ✅ Added this
+        }),
+
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        console.error("❌ Error from server:", data);
+        return;
+      }
+
+      console.log("✅ Click tracked:", data);
+
+      sessionStorage.setItem(`tracked-${article.url}`, "true"); // ✅ prevent duplicates
+
+      // Track click count for interest profile rebuild
+      let clickCount = parseInt(localStorage.getItem("clickCount") || "0", 10);
+      clickCount += 1;
+      localStorage.setItem("clickCount", clickCount.toString());
+
+      if (clickCount === 3) {
+        const rebuildResponse = await fetch("http://localhost:5000/api/rebuild-interest-profile", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const rebuildData = await rebuildResponse.json();
+        if (!rebuildResponse.ok) {
+          console.error("⚠️ Failed to rebuild interest profile:", rebuildData);
+        } else {
+          console.log("🚀 Interest profile rebuilt:", rebuildData);
+        }
+
+        localStorage.removeItem("clickCount");
+      }
+
+    } catch (error) {
+      console.error("🚨 Failed to track article click or rebuild profile:", error);
+    }
+  };
+
+  if (article) {
+    trackArticleClick();
+  }
+}, [article]);
+
+
+
+
+
   if (!article) {
     return <div className="article-container"><p>No article data provided.</p></div>;
   }
