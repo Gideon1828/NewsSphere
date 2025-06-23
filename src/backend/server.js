@@ -8,6 +8,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const cron = require("node-cron");
 const { generateDigest } = require("./utils/digest");
+const { generateTopPicksDigest } = require("./utils/topPicks");
 const axios = require("axios");
 const admin = require("./config/firebase"); // Adjust path if needed
 
@@ -391,6 +392,14 @@ app.get("/api/send-digest", async (req, res) => {
   }
 });
 
+app.get("/api/send-top-picks", async (req, res) => {
+  try {
+    await generateTopPicksDigest();
+    res.send("✅ Weekly top picks sent.");
+  } catch (err) {
+    res.status(500).send("❌ Error sending weekly digest.");
+  }
+});
 
 
 // 📥 Fetch Reddit posts from any subreddit (e.g., r/worldnews, r/technology)
