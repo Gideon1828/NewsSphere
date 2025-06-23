@@ -391,11 +391,7 @@ app.get("/api/send-digest", async (req, res) => {
   }
 });
 
-// Schedule a daily digest at 8 AM IST (2:30 AM UTC)
-cron.schedule("0 1 * * *", async () => {
-  console.log("⏰ Running scheduled daily digest at 7:00 AM IST...");
-  await generateDigest();
-});
+
 
 // 📥 Fetch Reddit posts from any subreddit (e.g., r/worldnews, r/technology)
 app.get("/api/reddit", async (req, res) => {
