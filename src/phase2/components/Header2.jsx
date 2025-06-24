@@ -1,8 +1,8 @@
 import './Header2.css';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useContext } from 'react';
 import { Search as SearchIcon, Bookmark, Bell, MoreHorizontal, User, Check } from 'lucide-react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-
+import { ThemeContext } from "../../context/ThemeContext";
 import Search from '../pages/Search';
 
 const Header2 = ({ onTopicSelect ,topicclicked }) => {
@@ -17,10 +17,11 @@ const Header2 = ({ onTopicSelect ,topicclicked }) => {
   const searchRef = useRef(null);
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  //const [isDarkMode, setIsDarkMode] = useState(false);
   const dropdownRef = useRef(null);
   const profileRef = useRef(null);
-
+const { darkMode, setDarkMode } = useContext(ThemeContext);
+const [fontSize, setFontSize] = useState('Normal');
 
   const modalRef = useRef(null);
   const [selectedLang, setSelectedLang] = useState('en'); // default language
@@ -123,8 +124,8 @@ const handleLanguageChange = (e) => {
 
   // Toggle dark mode
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.body.classList.toggle("dark-mode");
+    setDarkMode(!darkMode);
+    //document.body.classList.toggle("dark-mode");
   };
 
   // Handle logout
@@ -182,12 +183,27 @@ const handleLanguageChange = (e) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+useEffect(() => {
+  const savedSize = localStorage.getItem('fontSize') || 'Normal';
+  setFontSize(savedSize);
+  document.documentElement.style.setProperty('--user-font-size', savedSize);
+}, []);
 
   const toggleNotificationModal = () => {
     setIsNotificationOpen(!isNotificationOpen);
   };
 
- 
+ const handleFontSizeChange = (e) => {
+  const size = e.target.value;
+  setFontSize(size);
+  document.documentElement.style.setProperty('--user-font-size', size);
+  localStorage.setItem('fontSize', size);
+
+  // Optional: Add class to body to handle fixed pixel sizes
+  document.body.className = size; // e.g., "large", "small"
+};
+
+
 
   return (
     <div>
@@ -297,11 +313,27 @@ const handleLanguageChange = (e) => {
                 <button className="dropdown-item" onClick={() => handleNavigation("profile")}>
                   Profile
                 </button>
+                {/* here i want dynamic font size changer ui*/ }
+                <button className="dropdown-item">
+  <select
+    id="fontsize"
+    value={fontSize}
+    onChange={handleFontSizeChange}
+    style={{ padding: "3px", borderRadius: "6px" }}
+  >
+    <option value="small">Small</option>
+    <option value="Normal">Normal</option>
+    <option value="large">Large</option>
+    <option value="x-large">Very Large</option>
+  </select>
+  <label htmlFor="fontsize" style={{ marginRight: "8px" }}>Font size</label>
+</button>
+
                 <button className="dropdown-item" onClick={() => handleNavigation("options")}>
                   Options
                 </button>
                 <button className="dropdown-item" onClick={toggleDarkMode}>
-                  {isDarkMode && <Check size={24} />}
+                  {darkMode && <Check size={24} />}
                   <span>Dark mode</span>
                 </button>
                 <button  className="dropdown-item">

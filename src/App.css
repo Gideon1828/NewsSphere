@@ -1,0 +1,12 @@
+:root {
+  --user-font-size: Normal;
+}
+
+body {
+  font-size: var(--user-font-size);
+}
+.page-container {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}

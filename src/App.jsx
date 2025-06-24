@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ScrollToTop from "./ScrollToTop";
+import "./App.css"
 
 import Home from "./phase1/pages/Home.jsx";
 import Readnews from "./phase1/pages/Readnews.jsx";
@@ -14,7 +15,7 @@ import Readarticle from "./phase2/pages/Readarticle.jsx";
 
 const App = () => {
   return (
-    <div>
+    <div className="page-container">
       
         <ScrollToTop/>
         <Routes>

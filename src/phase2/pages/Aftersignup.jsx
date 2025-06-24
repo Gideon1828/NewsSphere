@@ -154,6 +154,19 @@ const response = await fetch("http://localhost:5000/api/smart-recommendations", 
     fetchRecommendedArticles();
   }, [selectedTopic, newsArticles]);
 
+  useEffect(() => {
+  const savedSize = localStorage.getItem('fontSize') || 'Normal';
+  document.documentElement.style.setProperty('--user-font-size', savedSize);
+}, []);
+useEffect(() => {
+  const saved = localStorage.getItem('fontSize'); // e.g., "Small", "Normal", "Large"
+  let scale = 1;
+  if (saved === 'Small') scale = 0.9;
+  else if (saved === 'Large') scale = 1.2;
+  document.documentElement.style.setProperty('--font-scale', scale);
+}, []);
+
+
 
 
   const handleBookmark = async (e, article) => {

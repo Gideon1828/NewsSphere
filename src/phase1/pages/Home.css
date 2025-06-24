@@ -1,138 +1,190 @@
-/* NewsPage.css */
-
+/* Base Styles */
 body {
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    background-color: #ffffff;
-    color: #000;
-  }
-  
-  .news-page {
-    max-width: 100%;
-    margin: auto;
-    padding: 0 0;
-  }
-  
-  
-  .Mymain{
-    padding: 0 20px;
-  }
-  .hero {
-    text-align: center;
-    margin: 60px 0 40px;
-  }
-  
-  .hero h1 {
-    font-size: 36px;
-    font-weight: bold;
-    margin: 10px 0;
-  }
-  
-  .cta-btn {
-    margin-top: 20px;
-    padding: 12px 24px;
-    font-weight: bold;
-    background-color: #ff5a1f;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
-    cursor: pointer;
-  }
-  
-  .category-nav {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    font-weight: bold;
-    border-bottom: 1px solid #ccc;
-    padding: 15px 0;
-    margin-bottom: 20px;
-  }
-  
-  .category-nav span {
-    cursor: pointer;
-    color: #555;
-  }
-  
-  .category-nav .active {
-    color: black;
-    border-bottom: 2px solid black;
-  }
-  
-  .articles-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(280px, 1fr));
-    gap: 40px;
-  }
-  .article-link {
-    text-decoration: none;
-    color: inherit;
-  }
-  
-  .article-card {
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
-    padding: 10px;
-    background-color: white;
-  }
-  
-  .card-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
-  
-  .source-avatar {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-  }
-  
-  .card-img {
-    width: 100%;
-    border-radius: 4px;
-    margin-bottom: 10px;
-  }
-  
-  .time {
-    color: #555;
-    font-size: 12px;
-  }
-  
-  .title {
-    font-size: 15px;
-    font-weight: bold;
-    margin: 10px 0;
-  }
-  
-  .author {
-    font-size: 12px;
-    color: #555;
-  }
-  
-  .card-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-    font-size: 16px;
-  }
-  
-  .read-more {
-    text-align: center;
-    margin: 40px 0;
-  }
-  
-  .read-more button {
-    background-color: #ff5a1f;
-    color: white;
-    padding: 10px 20px;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-  
-  
+  font-family: 'Segoe UI', sans-serif;
+  margin: 0;
+  background-color: #ffffff;
+  color: #000;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark {
+  background-color: #121212;
+  color: #e0e0e0;
+}
+
+.news-page {
+  max-width: 100%;
+  margin: auto;
+  padding: 0 0;
+}
+
+.Mymain {
+  padding: 0 20px;
+}
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  margin: 60px 0 40px;
+}
+
+.hero h1 {
+  font-size: 36px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.cta-btn {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-weight: bold;
+  background-color: #ff5a1f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+body.dark .cta-btn {
+  background-color: #e5531c;
+  box-shadow: 2px 2px 6px rgba(255, 255, 255, 0.1);
+}
+
+/* Category Navigation */
+.category-nav {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  font-weight: bold;
+  border-bottom: 1px solid #ccc;
+  padding: 15px 0;
+  margin-bottom: 20px;
+}
+
+body.dark .category-nav {
+  border-bottom: 1px solid #333;
+}
+
+.category-nav span {
+  font-family: 'Roboto', sans-serif;
+  cursor: pointer;
+  color: #555;
+}
+
+body.dark .category-nav span {
+  color: #bbb;
+}
+
+.category-nav .active {
+  color: black;
+  border-bottom: 2px solid black;
+}
+
+body.dark .category-nav .active {
+  color: #fff;
+  border-bottom: 2px solid #fff;
+}
+
+/* Article Grid */
+.articles-grid {
+  font-family: 'Inter', sans-serif;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(280px, 1fr));
+  gap: 40px;
+}
+
+.article-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Article Card */
+.article-card {
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+  padding: 10px;
+  background-color: white;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+body.dark .article-card {
+  background-color: #1e1e1e;
+  box-shadow: 0px 4px 8px rgba(255, 255, 255, 0.05);
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.source-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+
+/* Card Image */
+.card-img {
+  width: 100%;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+/* Meta Info */
+.time {
+  color: #555;
+  font-size: 12px;
+}
+
+body.dark .time {
+  color: #aaa;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+.author {
+  font-size: 12px;
+  color: #555;
+}
+
+body.dark .author {
+  color: #aaa;
+}
+
+/* Card Footer */
+.card-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  font-size: 16px;
+}
+
+/* Read More Section */
+.read-more {
+  text-align: center;
+  margin: 40px 0;
+}
+
+.read-more button {
+  background-color: #ff5a1f;
+  color: white;
+  padding: 10px 20px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+body.dark .read-more button {
+  background-color: #e5531c;
+}

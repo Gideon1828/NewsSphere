@@ -182,7 +182,7 @@ body {
 .news-card {
   background-color: #fff;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -371,6 +371,70 @@ body {
   background-color: #ffab91;
   color: #fff;
   cursor: not-allowed;
+}
+
+/* --------------------------------- */
+/* 🌙 Dark Mode Support via .dark */
+/* --------------------------------- */
+.dark body {
+  background-color: #111827;
+  color: #e5e7eb;
+}
+
+.dark .header,
+.dark .modal-content {
+  background-color: #121212;
+  border-color: #374151;
+}
+
+.dark .logo-text,
+.dark .page-title,
+.dark .page-subtitle,
+.dark .dropdown-item,
+.dark .nav-link,
+.dark .news-title,
+.dark .news-author,
+.dark .news-excerpt,
+.dark .modal-title,
+.dark .modal-description {
+  color: #f9fafb;
+}
+
+.dark .nav-link:hover,
+.dark .icon-button:hover {
+  color: #FF5722;
+}
+
+.dark .dropdown-menu {
+  background-color: #1f2937;
+  box-shadow: 0 4px 6px rgba(255, 255, 255, 0.05);
+}
+
+.dark .dropdown-item:hover {
+  background-color:rgb(125, 129, 134);
+}
+
+.dark .news-card {
+  background-color: #121212;
+  box-shadow: 0 1px 3px rgba(255, 255, 255, 0.05);
+}
+
+.dark .action-button:hover {
+  background-color: #374151;
+}
+
+.dark .action-icon,
+.dark .news-time {
+  color: #9ca3af;
+}
+
+.dark .topic-button {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+.dark .topic-button:hover {
+  background-color: #4b5563;
 }
 
 /* Responsive Styles */
