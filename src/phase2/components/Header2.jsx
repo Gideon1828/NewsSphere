@@ -306,11 +306,14 @@ const Header2 = ({ onTopicSelect, topicclicked }) => {
             </button>
 
             {isDropdownOpen && (
-              <div className="dropdown-menu" ref={dropdownRef}>
+              <div className="dropdown-menu profile-dropdown" ref={dropdownRef}>
                 <button className="dropdown-item" onClick={() => handleNavigation("profile")}>
                   Profile
                 </button>
-                <button className="dropdown-item">
+                <div className="dropdown-item">
+                  <label htmlFor="fontsize" style={{ marginRight: "8px" }}>
+                    Font size
+                  </label>
                   <select
                     id="fontsize"
                     value={fontSize}
@@ -322,10 +325,7 @@ const Header2 = ({ onTopicSelect, topicclicked }) => {
                     <option value="large">Large</option>
                     <option value="x-large">Very Large</option>
                   </select>
-                  <label htmlFor="fontsize" style={{ marginRight: "8px" }}>
-                    Font size
-                  </label>
-                </button>
+                </div>
                 <button className="dropdown-item" onClick={() => handleNavigation("options")}>
                   Options
                 </button>
@@ -333,7 +333,10 @@ const Header2 = ({ onTopicSelect, topicclicked }) => {
                   {darkMode && <Check size={24} />}
                   <span>Dark mode</span>
                 </button>
-                <button className="dropdown-item">
+                <div className="dropdown-item">
+                  <label htmlFor="language" style={{ marginRight: "8px" }}>
+                    Language
+                  </label>
                   <select
                     id="language"
                     value={selectedLang}
@@ -348,10 +351,7 @@ const Header2 = ({ onTopicSelect, topicclicked }) => {
                     <option value="zh">Chinese</option>
                     <option value="ar">Arabic</option>
                   </select>
-                  <label htmlFor="language" style={{ marginRight: "8px" }}>
-                    language
-                  </label>
-                </button>
+                </div>
                 <button className="dropdown-item" onClick={() => handleNavigation("privacy")}>
                   Privacy policy
                 </button>

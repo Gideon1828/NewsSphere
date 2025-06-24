@@ -191,7 +191,7 @@ html {
 
 .dropdown-menu {
   position: absolute;
-  transform: translateX(-100%);
+  transform: translateX(-80%);
   top: 60px;
   right: 0;
   width: 250px;
@@ -201,6 +201,21 @@ html {
   z-index: 1000;
   animation: slideDown 0.3s ease-out;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  display: block;
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Profile Dropdown - Specific styling for profile dropdown */
+.profile-dropdown {
+  transform: translateX(-75%) !important;
+  top: 50px;
+  right: 0;
+  width: 280px;
+  z-index: 2000 !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
 }
 
 .dropdown-item {
@@ -217,6 +232,7 @@ html {
   gap: 10px;
   color: var(--text-color);
   background: var(--bg-color);
+  border: none;
 }
 
 .dropdown-item:last-child {
