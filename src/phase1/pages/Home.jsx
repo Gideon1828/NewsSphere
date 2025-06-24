@@ -89,17 +89,30 @@ const Home = () => {
           </section>
 
           <nav className="category-nav">
-            {categories.map((category, index) => (
-              <span
-                key={index}
-                className={activeCategory === category.value ? "active" : ""}
-                onClick={() => handleCategoryClick(category.value)}
-                style={{ cursor: "pointer" }}
-              >
-                {category.label}
-              </span>
-            ))}
-          </nav>
+  {/* Select for small screens */}
+  <select
+    value={activeCategory}
+    onChange={(e) => handleCategoryClick(e.target.value)} // Reuse your handler
+  >
+    {categories.map((category, index) => (
+      <option key={index} value={category.value}>
+        {category.label}
+      </option>
+    ))}
+  </select>
+
+  {/* Span buttons for large screens */}
+  {categories.map((category, index) => (
+    <span
+      key={index}
+      className={activeCategory === category.value ? "active" : ""}
+      onClick={() => handleCategoryClick(category.value)}
+    >
+      {category.label}
+    </span>
+  ))}
+</nav>
+
 
           <main className="articles-grid">
             {articles.slice(0, articlesToShow).map((article, index) => (

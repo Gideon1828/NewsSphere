@@ -1,25 +1,24 @@
-import React, { useState, useEffect } from "react";
-import "./Categories.css";
-import { Link } from 'react-router-dom';
-import Header2 from "../components/Header2";
-import { useNavigate } from 'react-router-dom';
+"use client"
+
+import { useState } from "react"
+import "./Categories.css"
+import Header2 from "../components/Header2"
+import { useNavigate } from "react-router-dom"
 
 function Categories() {
-  const [showModal, setShowModal] = useState(true);
-  const [selectedTopics, setSelectedTopics] = useState([]);
-  const [showFoodDropdown, setShowFoodDropdown] = useState(false);
-  const navigate = useNavigate();
-
- 
+  const [showModal, setShowModal] = useState(true)
+  const [selectedTopics, setSelectedTopics] = useState([])
+  const [showFoodDropdown, setShowFoodDropdown] = useState(false)
+  const navigate = useNavigate()
 
   const handleTopicSelection = (topics) => {
-    setSelectedTopics(topics);
-    setShowModal(false);
-  };
+    setSelectedTopics(topics)
+    setShowModal(false)
+  }
 
   // Welcome Modal Component
   const WelcomeModal = () => {
-    const [localSelectedTopics, setLocalSelectedTopics] = useState(selectedTopics || []);
+    const [localSelectedTopics, setLocalSelectedTopics] = useState(selectedTopics || [])
 
     const topics = [
       "#NEWS",
@@ -51,44 +50,43 @@ function Categories() {
       "#Psychology",
       "#ENTREPRENEUERSHIP",
       "#CONSERVATIVE VIEW",
-    ];
+    ]
 
     const toggleTopic = (topic) => {
       if (localSelectedTopics.includes(topic)) {
-        setLocalSelectedTopics(localSelectedTopics.filter((t) => t !== topic));
+        setLocalSelectedTopics(localSelectedTopics.filter((t) => t !== topic))
       } else {
-        setLocalSelectedTopics([...localSelectedTopics, topic]);
+        setLocalSelectedTopics([...localSelectedTopics, topic])
       }
-    };
-
-  const handleContinue = async () => {
-          if (localSelectedTopics.length >= 3) {
-    handleTopicSelection(localSelectedTopics);
-
-    try {
-      const token = localStorage.getItem("token"); // Assuming you save it at login
-      const response = await fetch("https://newssphere-wxr1.onrender.com/api/save-categories", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ selectedCategory: localSelectedTopics }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        console.log("Categories saved:", data.message);
-        navigate("/Aftersignup");
-      } else {
-        console.error("Failed to save categories:", data.message);
-      }
-    } catch (error) {
-      console.error("Error saving categories:", error);
     }
-  }
-};
 
+    const handleContinue = async () => {
+      if (localSelectedTopics.length >= 3) {
+        handleTopicSelection(localSelectedTopics)
+
+        try {
+          const token = localStorage.getItem("token")
+          const response = await fetch("https://newssphere-wxr1.onrender.com/api/save-categories", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({ selectedCategory: localSelectedTopics }),
+          })
+
+          const data = await response.json()
+          if (response.ok) {
+            console.log("Categories saved:", data.message)
+            navigate("/Aftersignup")
+          } else {
+            console.error("Failed to save categories:", data.message)
+          }
+        } catch (error) {
+          console.error("Error saving categories:", error)
+        }
+      }
+    }
 
     return (
       <div className="modal-overlay">
@@ -102,35 +100,35 @@ function Categories() {
             </p>
 
             <div className="topics-container">
-              {topics.map((topic) => (
+              {topics.map((topic, index) => (
                 <button
                   key={topic}
                   className={`topic-button ${localSelectedTopics.includes(topic) ? "selected" : ""}`}
                   onClick={() => toggleTopic(topic)}
+                  style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   {topic}
                 </button>
               ))}
             </div>
-              <button
-                  className={`continue-button ${localSelectedTopics.length >= 3 ? "active" : "disabled"}`}
-                  onClick={handleContinue}
-                  disabled={localSelectedTopics.length < 3}>Continue
-              </button>
-            
+            <div className="selected-count">{localSelectedTopics.length}/3 topics selected</div>
+            <button
+              className={`continue-button ${localSelectedTopics.length >= 3 ? "active" : "disabled"}`}
+              onClick={handleContinue}
+              disabled={localSelectedTopics.length < 3}
+            >
+              Continue
+            </button>
           </div>
         </div>
       </div>
-    );
-  };
-
-  
-  
+    )
+  }
 
   // News Card Component
-  const NewsCard = () => {
+  const NewsCard = ({ index = 0 }) => {
     return (
-      <div className="news-card">
+      <div className="news-card" style={{ animationDelay: `${index * 0.1}s` }}>
         <div className="news-card-content">
           <div className="news-source">
             <div className="source-avatar">
@@ -141,26 +139,25 @@ function Categories() {
 
           <div className="news-image">
             <img src="https://via.placeholder.com/400x200" alt="News image" />
+            <div className="image-overlay"></div>
           </div>
 
           <div className="news-time">7 hours ago</div>
 
-          <h3 className="news-title">
-            Pope Francis on Breathing machine afer suffering sudden respiratory episode
-          </h3>
+          <h3 className="news-title">Pope Francis on Breathing machine afer suffering sudden respiratory episode</h3>
 
           <div className="news-author">
             <span>CNBC - By mathiew hawkins</span>
           </div>
 
           <p className="news-excerpt">
-            United arab emirates- feb 26,2025 : a cultural exchange delegation from china, organized by the state council
-            information office, we know that Echange is Important for most of the Countries so far is kudo to the team So
-            this is the first phase of the Project said Me
+            United arab emirates- feb 26,2025 : a cultural exchange delegation from china, organized by the state
+            council information office, we know that Echange is Important for most of the Countries so far is kudo to
+            the team So this is the first phase of the Project said Me
           </p>
 
           <div className="news-actions">
-            <button className="action-button">
+            <button className="action-button" title="Mark as read">
               <svg className="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M20 6L9 17L4 12"
@@ -171,7 +168,7 @@ function Categories() {
                 />
               </svg>
             </button>
-            <button className="action-button">
+            <button className="action-button" title="Save for later">
               <svg className="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M19 21L12 16L5 21V5C5 4.46957 5.21071 3.96086 5.58579 3.58579C5.96086 3.21071 6.46957 3 7 3H17C17.5304 3 18.0391 3.21071 18.4142 3.58579C18.7893 3.96086 19 4.46957 19 5V21Z"
@@ -182,7 +179,7 @@ function Categories() {
                 />
               </svg>
             </button>
-            <button className="action-button">
+            <button className="action-button" title="Share">
               <svg className="action-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z"
@@ -224,8 +221,8 @@ function Categories() {
           </div>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div className="app">
@@ -247,14 +244,14 @@ function Categories() {
           <h2 className="page-subtitle">The Best of EveryThing</h2>
 
           <div className="news-grid">
-            <NewsCard />
-            <NewsCard />
-            <NewsCard />
+            <NewsCard index={0} />
+            <NewsCard index={1} />
+            <NewsCard index={2} />
           </div>
         </div>
       </main>
     </div>
-  );
+  )
 }
 
-export default Categories;
+export default Categories

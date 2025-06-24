@@ -55,6 +55,7 @@ body.dark .cta-btn {
 .category-nav {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 20px;
   font-weight: bold;
   border-bottom: 1px solid #ccc;
@@ -70,6 +71,8 @@ body.dark .category-nav {
   font-family: 'Roboto', sans-serif;
   cursor: pointer;
   color: #555;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
 body.dark .category-nav span {
@@ -85,6 +88,47 @@ body.dark .category-nav .active {
   color: #fff;
   border-bottom: 2px solid #fff;
 }
+
+/* Hide select by default */
+.category-nav select {
+  display: none;
+}
+
+/* Small screen styles */
+@media (max-width: 480px) {
+  .category-nav {
+    display: block;
+    border: none;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+
+  .category-nav span {
+    display: none; /* Hide spans on small screens */
+  }
+
+  .category-nav select {
+    display: block; /* Show select only on small screens */
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  body.dark .category-nav select {
+    background: #222;
+    color: #bbb;
+    border: 1px solid #333;
+  }
+}
+
+
 
 /* Article Grid */
 .articles-grid {

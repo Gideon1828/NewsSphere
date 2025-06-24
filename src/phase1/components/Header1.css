@@ -1,6 +1,6 @@
 /* Base Styles */
 body {
-  font-family: 'Roboto', sans-serif;
+  font-family: "Roboto", sans-serif;
   margin: 0;
   padding: 0;
   background-color: #ffffff;
@@ -26,6 +26,7 @@ body.dark {
   align-items: center;
   padding: 20px 0;
   background-color: rgba(234, 234, 234, 1);
+  position: relative;
 }
 
 /* Dark mode header */
@@ -59,6 +60,13 @@ body.dark .logo {
   margin-right: 10px;
 }
 
+/* Desktop Navigation */
+.desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
 /* Search Bar */
 .search-bar {
   padding: 10px;
@@ -80,21 +88,28 @@ body.dark .search-bar {
   background-color: #ffffff;
   border: none;
   cursor: pointer;
-  
+  padding: 8px;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
 }
 
 body.dark .mode-toggle-btn {
   background-color: #2c2c2c;
 }
 
-.mode-toggle-btn:hover .mode-icon {
+.mode-toggle-btn:hover {
   transform: scale(1.1);
 }
 
 /* Auth Buttons */
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .auth-buttons button {
   padding: 10px 20px;
-  margin-left: 10px;
   border: none;
   border-radius: 999px;
   cursor: pointer;
@@ -118,6 +133,163 @@ body.dark .mode-toggle-btn {
 body.dark .login {
   background-color: #e0e0e0;
   color: #121212;
+}
+
+/* Burger Menu Button */
+.burger-menu {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 30px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+}
+
+.burger-line {
+  width: 30px;
+  height: 3px;
+  background-color: #0e0d0d;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+body.dark .burger-line {
+  background-color: #ffffff;
+}
+
+/* Burger Menu Animation */
+.burger-menu.active .burger-line:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.burger-menu.active .burger-line:nth-child(2) {
+  opacity: 0;
+}
+
+.burger-menu.active .burger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Mobile Navigation */
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 300px;
+  height: 100%;
+  background-color: rgba(234, 234, 234, 1);
+  z-index: 1000;
+  transition: right 0.3s ease;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+body.dark .mobile-nav {
+  background-color: #1e1e1e;
+}
+
+.mobile-nav.active {
+  right: 0;
+}
+
+.mobile-nav-content {
+  padding: 80px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  height: 100%;
+}
+
+/* Mobile Search Bar */
+.mobile-search {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Mobile Auth Buttons */
+.mobile-auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mobile-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  border-radius: 10px;
+  width: 100%;
+  justify-content: flex-start;
+  font-size: 16px;
+}
+
+.mobile-btn {
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .news-header {
+    padding: 15px 20px;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .burger-menu {
+    display: flex;
+  }
+
+  .logo {
+    font-size: 18px;
+    padding-left: 0;
+  }
+
+  .logo img {
+    width: 40px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .mobile-nav {
+    width: 280px;
+  }
+
+  .logo {
+    font-size: 16px;
+  }
+
+  .logo img {
+    width: 35px;
+  }
 }
 
 /* Optional: transition effect */
