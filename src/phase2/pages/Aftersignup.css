@@ -1,6 +1,6 @@
 /* Font and Theme Variables */
 :root {
-  --font-scale: 1; /* 0.9 = small, 1 = normal, 1.2 = large */
+  --user-font-size: 16px; /* Default font size. Override via JavaScript */
 
   --font-welcome: calc(18px * var(--font-scale));
   --font-title: calc(32px * var(--font-scale));
@@ -46,6 +46,51 @@
 body {
   background-color: var(--bg-color);
   color: var(--text-color);
+}
+
+.welcome-message {
+  font-size: var(--font-welcome);
+}
+
+.for-you-title {
+  font-size: var(--font-title);
+}
+
+.for-you-subtitle {
+  font-size: var(--font-subtitle);
+}
+
+.source-name {
+  font-size: var(--font-source);
+}
+
+.news-time {
+  font-size: var(--font-time);
+}
+
+.news-title {
+  font-size: var(--font-subtitle);
+}
+
+.news-author {
+  font-size: var(--font-author);
+}
+
+.news-content {
+  font-size: var(--font-content);
+}
+
+.action-button {
+  font-size: var(--font-button);
+}
+
+.read-more button {
+  font-size: var(--font-button);
+}
+
+.footer-link,
+.copyright {
+  font-size: var(--font-footer);
 }
 
 .news-container {

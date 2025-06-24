@@ -196,12 +196,24 @@ useEffect(() => {
  const handleFontSizeChange = (e) => {
   const size = e.target.value;
   setFontSize(size);
-  document.documentElement.style.setProperty('--user-font-size', size);
   localStorage.setItem('fontSize', size);
 
-  // Optional: Add class to body to handle fixed pixel sizes
-  document.body.className = size; // e.g., "large", "small"
+  const fontSizeMap = {
+    small: '14px',
+    Normal: '16px',
+    large: '18px',
+    'x-large': '20px'
+  };
+
+  const cssValue = fontSizeMap[size] || '16px';
+
+  document.documentElement.style.setProperty('--user-font-size', cssValue);
+
+  // Optional: Add to body for body-based font rules
+  document.body.classList.remove('small', 'Normal', 'large', 'x-large');
+  document.body.classList.add(size);
 };
+
 
 
 

@@ -65,9 +65,14 @@ body, html {
   padding: 12px 24px;
   background-color: var(--bg-color);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
-  z-index: 10;
+
+  position: fixed;        /* changed from relative */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;          /* increased to ensure it stays on top */
 }
+
 
 .header-left,
 .header-right {

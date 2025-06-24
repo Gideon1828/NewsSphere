@@ -1,4 +1,3 @@
-/* CSS Variables for consistent theming */
 :root {
   --primary-color: #1a1a1a;
   --secondary-color: #666;
@@ -11,6 +10,7 @@
   --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
   --shadow-medium: 0 4px 20px rgba(0, 0, 0, 0.15);
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --user-font-size: 16px; /* Default font size */
 }
 
 .dark {
@@ -26,6 +26,81 @@
   --shadow-medium: 0 4px 20px rgba(255, 255, 255, 0.1);
 }
 
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--background-color);
+  font-size: var(--user-font-size);
+}
+
+.read-article-container {
+  font-size: var(--user-font-size);
+  line-height: 1.7;
+}
+
+.read-article-content {
+  font-size: inherit;
+}
+
+.read-article-title {
+  font-size: calc(var(--user-font-size) + 8px);
+  font-weight: bold;
+}
+
+.read-article-meta,
+.article-meta,
+.related-source,
+.timestamp,
+.footer-link,
+.copyright {
+  font-size: calc(var(--user-font-size) - 2px);
+}
+
+.article-text,
+.article-paragraph,
+.sidebar-text,
+.related-item-title,
+.read-more-btn,
+.read-full-btn {
+  font-size: var(--user-font-size);
+}
+
+.article-paragraph {
+  font-family: 'Merriweather', serif;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.sidebar-text {
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.related-item-title {
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 8px;
+  color: var(--primary-color);
+}
+
+.read-more-btn,
+.read-full-btn {
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+/* Ensure media queries do not override font-size with fixed values */
+@media (max-width: 768px) {
+  .article-text {
+    font-size: var(--user-font-size);
+  }
+}
 /* Reset and base styles */
 * {
   margin: 0;
