@@ -21,6 +21,7 @@ const App = () => {
         <Routes>
           {/*Phase1*/}
           <Route path="/" element={<Home />} />
+          <Route path="/search/:query" element={<Home />} />
           <Route path="/Readnews" element={<Readnews />} />
           <Route path="Login" element={<Login />} />
           <Route path="Signup" element={<Signup />} />

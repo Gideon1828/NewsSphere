@@ -3,15 +3,18 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import "./Home.css"
-import { Link } from "react-router-dom"
+import { Link,  useNavigate  } from "react-router-dom"
 import Header1 from "../components/Header1"
 import Footer from "../components/Footer"
+import { useParams } from "react-router-dom";
+
 
 const Home = () => {
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("general")
   const [articles, setArticles] = useState([])
   const [articlesToShow, setArticlesToShow] = useState(6)
-
+  const { query } = useParams(); // from /search/:query
   const categories = [
     { label: "General", value: "general" },
     { label: "Entertainment", value: "entertainment" },
@@ -20,6 +23,13 @@ const Home = () => {
     { label: "Food", value: "food" },
     { label: "Sports", value: "sports" },
   ]
+  // 🔁 Reset active category when on a search page
+useEffect(() => {
+  if (query) {
+    setActiveCategory(null);  // during search, no category is active
+  }
+}, [query]);
+
 
   const categoryToSubreddit = {
     general: "news",
@@ -30,72 +40,81 @@ const Home = () => {
     sports: "sports",
   }
 
-  const handleCategoryClick = (categoryValue) => {
-    setActiveCategory(categoryValue)
-    setArticlesToShow(6) // Reset article count on category change
-  }
+ const handleCategoryClick = (categoryValue) => {
+  navigate("/");
+  setActiveCategory(categoryValue);
+  setArticlesToShow(6); // Reset count
+          // 🔁 Clear search route to restore hero
+};
 
   const handleReadMore = () => {
     setArticlesToShow((prev) => prev + 3)
   }
 
   useEffect(() => {
+   /*  const isSearch = Boolean(query);
+
+  // 🟡 Disable category highlight during search
+  if (isSearch && activeCategory !== null) {
+    setActiveCategory(null);
+  } */
   const fetchArticles = async () => {
     let gnewsArticles = [];
 
-    // ✅ Step 1: Try GNews with first key, fallback to second
+    const searchTerm = query || activeCategory;
+    const isSearch = Boolean(query);
+
+    const cleanedQuery = searchTerm.trim().replace(/\s+/g, " ");
+    const encodedQuery = encodeURIComponent(cleanedQuery);
+
     try {
       const res1 = await fetch(
-        `https://gnews.io/api/v4/top-headlines?category=${activeCategory}&lang=en&country=in&max=20&apikey=5d808f3800d44aaac70cea0db99f68ad`
+        `https://gnews.io/api/v4/${isSearch ? "search" : "top-headlines"}?${isSearch ? `q=${encodedQuery}` : `category=${activeCategory}`}&lang=en&country=in&max=20&apikey=5d808f3800d44aaac70cea0db99f68ad`
       );
       const data1 = await res1.json();
 
-      if (data1.articles && data1.articles.length > 0) {
+      if (data1.articles?.length > 0) {
         gnewsArticles = data1.articles;
       } else {
-        throw new Error("First GNews key failed or returned no articles.");
+        throw new Error("First key returned no articles");
       }
     } catch (err1) {
-      console.warn("❌ First GNews key failed. Trying second...");
-
+      console.warn("First key failed, trying second…");
       try {
         const res2 = await fetch(
-          `https://gnews.io/api/v4/top-headlines?category=${activeCategory}&lang=en&country=in&max=20&apikey=553dc14c7832190909f27b1b12fa5252`
+          `https://gnews.io/api/v4/${isSearch ? "search" : "top-headlines"}?${isSearch ? `q=${encodedQuery}` : `category=${activeCategory}`}&lang=en&country=in&max=20&apikey=553dc14c7832190909f27b1b12fa5252`
         );
         const data2 = await res2.json();
-
-        if (data2.articles && data2.articles.length > 0) {
+        if (data2.articles?.length > 0) {
           gnewsArticles = data2.articles;
         } else {
-          throw new Error("Second GNews key failed too.");
+          throw new Error("Second key also failed");
         }
       } catch (err2) {
-        console.error("❌ Both GNews keys failed:", err2);
+        console.error("Both GNews keys failed:", err2);
 
-        // ✅ Only now — if both GNews keys failed — fetch Reddit
-        let redditFormatted = [];
-        try {
-          const redditResponse = await fetch(
-            `https://newssphere-wxr1.onrender.com/api/reddit?subreddit=${categoryToSubreddit[activeCategory]}&limit=10`
-          );
-          const redditData = await redditResponse.json();
+        // Try Reddit fallback only when it's NOT a search
+        if (!isSearch) {
+          try {
+            const redditResponse = await fetch(
+              `https://newssphere-wxr1.onrender.com/api/reddit?subreddit=${categoryToSubreddit[activeCategory]}&limit=10`
+            );
+            const redditData = await redditResponse.json();
 
-          if (Array.isArray(redditData)) {
-            redditFormatted = redditData.map((post) => ({
-              title: post.title,
-              url: post.url,
-              image: post.image || "/placeholder.png",
-              publishedAt: post.publishedAt || new Date().toISOString(),
-              source: { name: post.source || "Reddit", url: post.url },
-              fromReddit: true,
-            }));
+            if (Array.isArray(redditData)) {
+              gnewsArticles = redditData.map((post) => ({
+                title: post.title,
+                url: post.url,
+                image: post.image || "/placeholder.png",
+                publishedAt: post.publishedAt || new Date().toISOString(),
+                source: { name: post.source || "Reddit", url: post.url },
+                fromReddit: true,
+              }));
+            }
+          } catch (redditErr) {
+            console.warn("Reddit fetch failed:", redditErr);
           }
-        } catch (err) {
-          console.warn("⚠️ Reddit fetch failed:", err);
         }
-
-        // ❗ Combine Reddit only if GNews failed
-        gnewsArticles = redditFormatted;
       }
     }
 
@@ -104,7 +123,8 @@ const Home = () => {
   };
 
   fetchArticles();
-}, [activeCategory]);
+}, [activeCategory, query]);
+
 
 
 
@@ -183,42 +203,48 @@ const Home = () => {
       <div className="news-page">
         <main className="Mymain">
           <motion.section className="hero" variants={heroVariants}>
+            {query ? (
             <motion.h1
-              initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              Stay Informed
-            </motion.h1>
+              transition={{ duration: 0.6, delay: 0.2 }}>Search results for: <em>{query}</em></motion.h1>
+            ) : (
+              <>
             <motion.h1
-              initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              Stay Ahead
-            </motion.h1>
-            <Link to="/Signup">
+              transition={{ duration: 0.6, delay: 0.4 }}>Stay Informed</motion.h1>
+              <motion.h1>Stay Ahead</motion.h1>
+              <Link to="/Signup">
               <motion.button className="cta-btn" variants={buttonVariants} whileHover="hover" whileTap="tap">
                 Sign Up
               </motion.button>
             </Link>
+            </>
+            )}
+
+            
           </motion.section>
 
           <motion.nav className="category-nav" variants={categoryVariants}>
             {/* Select for small screens */}
+           <div className="custom-select-wrapper">
             <motion.select
-              value={activeCategory}
+              value={activeCategory || ""}
               onChange={(e) => handleCategoryClick(e.target.value)}
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-            >
-              {categories.map((category, index) => (
-                <option key={index} value={category.value}>
-                  {category.label}
-                </option>
+              className="custom-select"
+              >
+            {categories.map((category, index) => (
+              <option key={index} value={category.value}>
+              {category.label}
+              </option>
               ))}
-            </motion.select>
+              </motion.select>
+          </div>
+
 
             {/* Span buttons for large screens */}
             {categories.map((category, index) => (

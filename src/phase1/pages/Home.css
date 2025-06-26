@@ -107,6 +107,8 @@ body.dark .category-nav .active {
     display: none; /* Hide spans on small screens */
   }
 
+
+
   .category-nav select {
     display: block; /* Show select only on small screens */
     width: 100%;
@@ -231,4 +233,49 @@ body.dark .author {
 
 body.dark .read-more button {
   background-color: #e5531c;
+}
+
+/* Default: Hide on larger screens */
+.custom-select-wrapper {
+  display: none;
+}
+
+/* Show only on small screens (≤480px) */
+@media (max-width: 480px) {
+  .custom-select-wrapper {
+    display: block;
+    padding: 10px;
+    position: relative;
+    width: 100%; 
+    font-size: 1rem;
+    font-weight: bold;
+    
+    border-radius: 5px;/* adjust as needed */
+    
+     
+  }
+
+  .custom-select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    width: 100%;
+    padding: 10px 40px 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: var(--background-color, white);
+    font-size: 16px;
+    cursor: pointer;
+  }
+
+  .custom-select-wrapper::after {
+    content: "▼";
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: gray;
+    font-size: 12px;
+  }
 }

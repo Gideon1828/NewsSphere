@@ -1,13 +1,15 @@
 "use client"
 
 import { useContext, useState } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import "./Header1.css"
 import { ThemeContext } from "../../context/ThemeContext"
 
 const Header1 = () => {
-  const { darkMode, setDarkMode } = useContext(ThemeContext)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+ const { darkMode, setDarkMode } = useContext(ThemeContext);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // ✅ This fixes the error
+  const navigate = useNavigate();
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -16,6 +18,20 @@ const Header1 = () => {
   const closeMobileMenu = () => {
     setIsMobileMenuOpen(false)
   }
+
+  const handleSearch = (e) => {
+  if (e.key === "Enter") {
+    const cleanedQuery = searchQuery
+      .trim()                    // remove leading/trailing spaces
+      .replace(/\s+/g, " ");     // replace multiple spaces with single space
+
+    if (cleanedQuery) {
+      navigate(`/search/${encodeURIComponent(cleanedQuery)}`);
+      setSearchQuery("");
+      closeMobileMenu();
+    }
+  }
+};
 
   return (
     <div className="news-page">
@@ -29,7 +45,14 @@ const Header1 = () => {
 
         {/* Desktop Navigation */}
         <div className="desktop-nav">
-          <input className="search-bar" type="text" placeholder="Search" />
+          <input
+  className="search-bar"
+  type="text"
+  placeholder="Search"
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+  onKeyDown={handleSearch}
+/>
           <div className="auth-buttons">
             <button onClick={() => setDarkMode(!darkMode)} className="mode-toggle-btn">
               {darkMode ? "☀️" : "🌙"}
@@ -60,7 +83,14 @@ const Header1 = () => {
         {/* Mobile Navigation Menu */}
         <nav className={`mobile-nav ${isMobileMenuOpen ? "active" : ""}`}>
           <div className="mobile-nav-content">
-            <input className="search-bar mobile-search" type="text" placeholder="Search" />
+            <input
+  className="search-bar mobile-search"
+  type="text"
+  placeholder="Search"
+  value={searchQuery}
+  onChange={(e) => setSearchQuery(e.target.value)}
+  onKeyDown={handleSearch}
+/>
 
             <div className="mobile-auth-buttons">
               <button onClick={() => setDarkMode(!darkMode)} className="mode-toggle-btn mobile-mode-toggle">
