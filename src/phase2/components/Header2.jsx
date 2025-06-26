@@ -167,7 +167,7 @@ const Header2 = ({ onTopicSelect, topicclicked }) => {
       setActiveTopic("")
     }
     if (isAfterSignupPage) {
-      setActiveTopic("For You")
+      setActiveTopic("Latest")
     }
   }, [isReadLaterPage, isAfterSignupPage])
 
@@ -232,18 +232,19 @@ const Header2 = ({ onTopicSelect, topicclicked }) => {
           <nav className="nav-links desktop-nav">
             <a
               href="#"
-              className={`nav-link ${activeTopic === "For You" ? "active" : ""}`}
-              onClick={() => handleTopicClick("For You")}
-            >
-              For You
-            </a>
-            <a
-              href="#"
               className={`nav-link ${activeTopic === "Latest" ? "active" : ""}`}
               onClick={() => handleTopicClick("Latest")}
             >
               Latest
             </a>
+            <a
+              href="#"
+              className={`nav-link ${activeTopic === "For You" ? "active" : ""}`}
+              onClick={() => handleTopicClick("For You")}
+            >
+              For You
+            </a>
+            
             {visibleTopics.map((topic) => (
               <a
                 key={topic}
@@ -398,17 +399,17 @@ const Header2 = ({ onTopicSelect, topicclicked }) => {
           <div className="mobile-nav-links">
             <a
               href="#"
-              className={`mobile-nav-link ${activeTopic === "For You" ? "active" : ""}`}
-              onClick={() => handleTopicClick("For You")}
-            >
-              For You
-            </a>
-            <a
-              href="#"
               className={`mobile-nav-link ${activeTopic === "Latest" ? "active" : ""}`}
               onClick={() => handleTopicClick("Latest")}
             >
               Latest
+            </a>
+            <a
+              href="#"
+              className={`mobile-nav-link ${activeTopic === "For You" ? "active" : ""}`}
+              onClick={() => handleTopicClick("For You")}
+            >
+              For You
             </a>
             {userTopics.map((topic) => (
               <a

@@ -156,10 +156,18 @@ const Readarticle = () => {
             <div className="cnbc-logo">
               <img
                 className="source-avatar"
-                src={`https://www.google.com/s2/favicons?sz=32&domain_url=${article.source.url || article.url}`}
-                alt={article.source.name || article.source || "Unknown Source"}
+                src={`https://www.google.com/s2/favicons?sz=32&domain_url=${article.source?.url || article.url }`}
+               alt={
+  typeof article.source === "object"
+    ? article.source.name || "Unknown Source"
+    : article.source || "Unknown Source"
+}
               />
-              <span className="logo-text">{article.source?.name ||article.source  || "Unknown Source"}</span>
+              <span className="logo-text">
+  {typeof article.source === "object"
+    ? article.source.name || "Unknown Source"
+    : article.source || "Unknown Source"}
+</span>
             </div>
           </div>
         </header>

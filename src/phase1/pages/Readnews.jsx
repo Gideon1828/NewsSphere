@@ -13,7 +13,7 @@ const Readnews = () => {
   const [relatedArticles, setRelatedArticles] = useState([]);
   const [storyboardArticles, setStoryboardArticles] = useState([]);
 
-  const API_KEY = "553dc14c7832190909f27b1b12fa5252"; // 🔁 Replace with your real key
+  const API_KEY = "7ff96f128765d291d0276d3769d1827d"; // 🔁 Replace with your real key
   const BASE_URL = "https://gnews.io/api/v4/search";
 
   // If no article is passed, redirect back

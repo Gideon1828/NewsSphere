@@ -402,7 +402,6 @@ app.get("/api/send-top-picks", async (req, res) => {
 });
 
 
-// 📥 Fetch Reddit posts from any subreddit (e.g., r/worldnews, r/technology)
 app.get("/api/reddit", async (req, res) => {
   const { subreddit = "news", limit = 10 } = req.query;
 
@@ -411,7 +410,13 @@ app.get("/api/reddit", async (req, res) => {
       headers: { "User-Agent": "NewsSphereBot/1.0" },
     });
 
-    const posts = response.data.data.children.map(post => {
+    const children = response.data?.data?.children;
+
+    if (!Array.isArray(children) || children.length === 0) {
+      return res.status(404).json({ message: `No posts found for subreddit r/${subreddit}` });
+    }
+
+    const posts = children.map(post => {
       const data = post.data;
 
       return {
@@ -419,7 +424,7 @@ app.get("/api/reddit", async (req, res) => {
         url: `https://reddit.com${data.permalink}`,
         author: data.author || "Unknown",
         publishedAt: new Date(data.created_utc * 1000).toISOString(),
-        source: `r/${subreddit}`, // Reddit source
+        source: `r/${subreddit}`,
         image:
           data.preview?.images?.[0]?.source?.url.replace(/&amp;/g, "&") ||
           (data.thumbnail?.startsWith("http") ? data.thumbnail : null) ||
@@ -430,10 +435,12 @@ app.get("/api/reddit", async (req, res) => {
 
     res.status(200).json(posts);
   } catch (err) {
-    /* console.error("Reddit fetch error:", err.message); */
-    res.status(500).json({ message: "Failed to fetch from Reddit" });
+    console.error("Reddit fetch error:", err.message);
+    res.status(500).json({ message: "Failed to fetch from Reddit", error: err.message });
   }
 });
+
+
 
 
 // ✅ Route: Track article click/read
