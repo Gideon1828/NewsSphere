@@ -24,4 +24,5 @@ dist-ssr
 *.sw?
 
 # Firebase admin key
-firebaseServiceKey.json
+server/config/firebaseServiceKey.json
+
