@@ -1,1 +1,65 @@
-s
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test-build-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 🔥 Step 1: Checkout Code
+      - name: Checkout Repository Code
+        uses: actions/checkout@v3
+
+      # 🔥 Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      # 🔥 Step 2.1: Install Frontend Dependencies
+      - name: Install Frontend Dependencies
+        run: npm install
+        working-directory: ./client
+
+      # 🔥 Step 2.2: Run Frontend Tests
+      - name: Run Frontend Tests
+        run: npm test
+        working-directory: ./client
+
+      # 🔥 Step 2.3: Install Backend Dependencies
+      - name: Install Backend Dependencies
+        run: npm install
+        working-directory: ./server
+
+      # 🔥 Step 2.4: Run Backend Tests
+      - name: Run Backend Tests
+        run: npm test
+        working-directory: ./server
+
+      # 🔥 Step 3: Set up Docker Buildx
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # 🔥 Step 4: Build Frontend and Backend Docker Images using docker-compose
+      - name: Build Frontend and Backend Images
+        run: docker-compose build
+
+      # 🔥 Step 5.1: Log in to Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      # 🔥 Step 5.2: Push frontend image
+      - name: Push frontend image
+        run: docker push gideon1828/frontend:latest
+
+      # 🔥 Step 5.3: Push backend image
+      - name: Push backend image
+        run: docker push gideon1828/backend:latest
