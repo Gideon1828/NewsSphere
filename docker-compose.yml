@@ -1,6 +1,7 @@
 services:
   frontend:
     build: ./client
+    image: gideon1828/frontend:latest
     ports:
       - "80:80"
     depends_on:
@@ -10,6 +11,7 @@ services:
     build:
       context: ./server
       dockerfile: Dockerfile
+    image: gideon1828/backend:latest
     ports:
       - "5000:5000"
     env_file:
