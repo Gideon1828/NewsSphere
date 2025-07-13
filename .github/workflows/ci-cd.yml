@@ -47,7 +47,7 @@ jobs:
 
       # 🔥 Step 4: Build Frontend and Backend Docker Images using docker-compose
       - name: Build Frontend and Backend Images
-        run: docker-compose build
+        run: docker compose build
 
       # 🔥 Step 5.1: Log in to Docker Hub
       - name: Log in to Docker Hub
