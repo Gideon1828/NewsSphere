@@ -5,6 +5,7 @@ import "./App.css"
 import Home from "./phase1/pages/Home.jsx";
 import Readnews from "./phase1/pages/Readnews.jsx";
 import Login from "./phase1/pages/Login.jsx";
+import OAuthSuccess from "./phase1/pages/OAuthSuccess.jsx";
 import Signup from "./phase1/pages/Signup.jsx";
 
 import Categories from "./phase2/pages/Categories.jsx";
@@ -24,6 +25,7 @@ const App = () => {
           <Route path="/search/:query" element={<Home />} />
           <Route path="/Readnews" element={<Readnews />} />
           <Route path="Login" element={<Login />} />
+          <Route path="OAuthSuccess" element={<OAuthSuccess />} />
           <Route path="Signup" element={<Signup />} />
           {/*Phase2*/}
           <Route path="Categories" element={<Categories />} />

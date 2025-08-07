@@ -11,7 +11,9 @@ const { generateDigest } = require("./utils/digest");
 const { generateTopPicksDigest } = require("./utils/topPicks");
 const axios = require("axios");
 const admin = require("./config/firebase"); // Adjust path if needed
-
+const session = require("express-session");
+const passport = require("passport");
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 
 const app = express();
 dotenv.config();
@@ -28,7 +30,23 @@ const db = admin.firestore();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(session({ secret: "keyboard cat", resave: false, saveUninitialized: false }));
+app.use(passport.initialize());
+app.use(passport.session());
 
+const verifyToken = async (req, res, next) => {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const decoded = jwt.verify(token, "secretKey");
+    req.user = await User.findById(decoded.id);
+    if (!req.user) return res.status(404).json({ error: "User not found" });
+    next();
+  } catch (error) {
+    res.status(401).json({ error: "Invalid token" });
+  }
+};
 // Middleware to handle JSON requests
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization']; // Expect header like "Bearer <token>"
@@ -687,5 +705,96 @@ app.get("/api/get-clicked-articles", authenticateToken, async (req, res) => {
   }
 });
 
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const userDoc = await db.collection("users").doc(id).get();
+    if (!userDoc.exists) return done(null, false);
+    done(null, { id: userDoc.id, ...userDoc.data() });
+  } catch (err) {
+    done(err, null);
+  }
+});
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: "https://newssphere-wxr1.onrender.com/auth/google/callback",
+}, async (accessToken, refreshToken, profile, done) => {
+  try {
+    const email = profile.emails[0].value;
+    const userSnapshot = await db.collection("users").where("email", "==", email).get();
+
+    let userDoc, isNewUser = false;
+
+    if (!userSnapshot.empty) {
+      userDoc = userSnapshot.docs[0];
+    } else {
+      const newUserRef = await db.collection("users").add({
+        email,
+        fullName: profile.displayName || email,
+        googleId: profile.id,
+        createdAt: new Date(),
+        selectedCategory: null,
+        isNotificationOn: false,
+        readLaterNews: [],
+      });
+      userDoc = await newUserRef.get();
+      isNewUser = true;
+    }
+
+    const user = { id: userDoc.id, ...userDoc.data(), isNewUser };
+    done(null, user);
+  } catch (err) {
+    console.error("Google OAuth error:", err);
+    done(err, null);
+  }
+}));
+
+
+
+// OAuth Routes
+app.get('/auth/google',
+  passport.authenticate('google', {
+    scope: ['profile', 'email']  // MUST include 'email'
+  })
+);
+
+app.get("/auth/google/callback",
+  passport.authenticate("google", { failureRedirect: "/Login" }),
+  async (req, res) => {
+    try {
+      const user = req.user; // This should have { id, email, fullName, ... }
+
+      // Add this flag from earlier logic (set this properly in passport strategy)
+      const isNewUser = user.isNewUser || false;
+
+      const token = jwt.sign(
+        {
+          userId: user.id,
+          email: user.email,
+          fullName: user.fullName,
+          isNewUser, // ⬅️ Add this
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      // You can either:
+      // 1. Encode isNewUser into the token (as above), and decode it on frontend
+      // OR
+      // 2. Pass it as a query param
+      res.redirect(`https://newssphere-2025.vercel.app/OAuthSuccess?token=${token}&isNewUser=${isNewUser}`);
+    } catch (err) {
+      console.error("OAuth redirect error:", err);
+      res.redirect("/Login");
+    }
+  }
+);
+
+app.get("/success", (req, res) => {
+  res.send("OAuth login success! Token in query param.");
+});
 
 app.listen(PORT, () => console.log(`Server running at http://localhost:${PORT}`));

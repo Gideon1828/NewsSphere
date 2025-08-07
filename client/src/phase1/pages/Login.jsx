@@ -147,7 +147,9 @@ const Login = () => {
 
         <p className="login-or">or Login with</p>
         <div className="login-icons">
-          <img src="/google.png" alt="Google" />
+          <a href="https://newssphere-wxr1.onrender.com/auth/google"> 
+            <img src="/google.png" alt="Google" />
+          </a>
         </div>
 
         <p className="login-footer">
